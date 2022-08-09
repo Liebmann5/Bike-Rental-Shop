@@ -1,0 +1,2917 @@
+codeally@1f3a9065ddf8:~/project$ echo hello terminal
+hello terminal
+codeally@1f3a9065ddf8:~/project$ psql --username=freecodecamp --dbname=postgres
+Border style is 2.
+Title is " ".
+Pager usage is off.
+psql (12.9 (Ubuntu 12.9-2.pgdg20.04+1))
+Type "help" for help.
+
+postgres=> \l
+                               List of databases
++-----------+----------+----------+---------+---------+-----------------------+
+|   Name    |  Owner   | Encoding | Collate |  Ctype  |   Access privileges   |
++-----------+----------+----------+---------+---------+-----------------------+
+| postgres  | postgres | UTF8     | C.UTF-8 | C.UTF-8 |                       |
+| template0 | postgres | UTF8     | C.UTF-8 | C.UTF-8 | =c/postgres          +|
+|           |          |          |         |         | postgres=CTc/postgres |
+| template1 | postgres | UTF8     | C.UTF-8 | C.UTF-8 | =c/postgres          +|
+|           |          |          |         |         | postgres=CTc/postgres |
++-----------+----------+----------+---------+---------+-----------------------+
+(3 rows)
+
+postgres=> CREATE DATABASE bikes;
+CREATE DATABASE
+postgres=> \d
+Did not find any relations.
+postgres=> \l
+postgres=>                                  List of databases
++-----------+--------------+----------+---------+---------+-----------------------+
+|   Name    |    Owner     | Encoding | Collate |  Ctype  |   Access privileges   |
++-----------+--------------+----------+---------+---------+-----------------------+
+| bikes     | freecodecamp | UTF8     | C.UTF-8 | C.UTF-8 |                       |
+| postgres  | postgres     | UTF8     | C.UTF-8 | C.UTF-8 |                       |
+| template0 | postgres     | UTF8     | C.UTF-8 | C.UTF-8 | =c/postgres          +|
+|           |              |          |         |         | postgres=CTc/postgres |
+| template1 | postgres     | UTF8     | C.UTF-8 | C.UTF-8 | =c/postgres          +|
+|           |              |          |         |         | postgres=CTc/postgres |
++-----------+--------------+----------+---------+---------+-----------------------+
+(4 rows)
+
+\c bikes
+You are now connected to database "bikes" as user "freecodecamp".
+bikes=> CREATE TABLE bikes();
+bikes=> CREATE TABLE
+\d
+            List of relations
++--------+-------+-------+--------------+
+| Schema | Name  | Type  |    Owner     |
++--------+-------+-------+--------------+
+| public | bikes | table | freecodecamp |
++--------+-------+-------+--------------+
+(1 row)
+
+bikes=> ALTER TABLE bikes ADD COLUMN bike_id SERIAL PRIMARY KEY;
+ALTER TABLE
+bikes=> \d bikes
+                                Table "public.bikes"
++---------+---------+-----------+----------+----------------------------------------+
+| Column  |  Type   | Collation | Nullable |                Default                 |
++---------+---------+-----------+----------+----------------------------------------+
+| bike_id | integer |           | not null | nextval('bikes_bike_id_seq'::regclass) |
++---------+---------+-----------+----------+----------------------------------------+
+Indexes:
+    "bikes_pkey" PRIMARY KEY, btree (bike_id)
+
+bikes=> ALTER TABLE bikes ADD COLUMN type VARCHAR(50) NOT NULL;
+bikes=> ALTER TABLE
+\d bikes
+                                       Table "public.bikes"
++---------+-----------------------+-----------+----------+----------------------------------------+
+| Column  |         Type          | Collation | Nullable |                Default                 |
++---------+-----------------------+-----------+----------+----------------------------------------+
+| bike_id | integer               |           | not null | nextval('bikes_bike_id_seq'::regclass) |
+| type    | character varying(50) |           | not null |                                        |
++---------+-----------------------+-----------+----------+----------------------------------------+
+Indexes:
+    "bikes_pkey" PRIMARY KEY, btree (bike_id)
+
+bikes=> ALTER TABLE bikes ADD COLUMN size INT NOT NULL;
+bikes=> ALTER TABLE
+ALTER TABLE bikes ADD COLUMN available=TRUE BOOLEAN NOT NULL;
+ERROR:  syntax error at or near "="
+LINE 1: ALTER TABLE bikes ADD COLUMN available=TRUE BOOLEAN NOT NULL...
+                                              ^
+bikes=> ALTER TABLE bikes ADD COLUMN available BOOLEAN NOT NULL DEFAULT TRUE;
+bikes=> ALTER TABLE
+\d bikes
+                                        Table "public.bikes"
++-----------+-----------------------+-----------+----------+----------------------------------------+
+|  Column   |         Type          | Collation | Nullable |                Default                 |
++-----------+-----------------------+-----------+----------+----------------------------------------+
+| bike_id   | integer               |           | not null | nextval('bikes_bike_id_seq'::regclass) |
+| type      | character varying(50) |           | not null |                                        |
+| size      | integer               |           | not null |                                        |
+| available | boolean               |           | not null | true                                   |
++-----------+-----------------------+-----------+----------+----------------------------------------+
+Indexes:
+    "bikes_pkey" PRIMARY KEY, btree (bike_id)
+
+bikes=> CREATE TABLE customers();
+CREATE TABLE
+bikes=> ALTER TABLE customers ADD COLUMN customer_id SERIAL PRIMARY KEY;
+ALTER TABLE
+bikes=> \d customers
+bikes=>                                     Table "public.customers"
++-------------+---------+-----------+----------+------------------------------------------------+
+|   Column    |  Type   | Collation | Nullable |                    Default                     |
++-------------+---------+-----------+----------+------------------------------------------------+
+| customer_id | integer |           | not null | nextval('customers_customer_id_seq'::regclass) |
++-------------+---------+-----------+----------+------------------------------------------------+
+Indexes:
+    "customers_pkey" PRIMARY KEY, btree (customer_id)
+
+ALTER TABLE customers ADD COLUMN phone VARCHAR(15) UNIQUE NOT NULL;
+ALTER TABLE
+bikes=> ALTER TABLE customers ADD COLUMN name VARCHAR(40) NOT NULL;
+ALTER TABLE
+bikes=> \d customers
+bikes=>                                            Table "public.customers"
++-------------+-----------------------+-----------+----------+------------------------------------------------+
+|   Column    |         Type          | Collation | Nullable |                    Default                     |
++-------------+-----------------------+-----------+----------+------------------------------------------------+
+| customer_id | integer               |           | not null | nextval('customers_customer_id_seq'::regclass) |
+| phone       | character varying(15) |           | not null |                                                |
+| name        | character varying(40) |           | not null |                                                |
++-------------+-----------------------+-----------+----------+------------------------------------------------+
+Indexes:
+    "customers_pkey" PRIMARY KEY, btree (customer_id)
+    "customers_phone_key" UNIQUE CONSTRAINT, btree (phone)
+
+CREATE TABLE rentals();
+bikes=> CREATE TABLE
+ALTER TABLE rentals ADD COLUMN rental_id SERIAL PRIMARY KEY;
+ALTER TABLE
+bikes=> \d rentals
+                                  Table "public.rentals"
++-----------+---------+-----------+----------+--------------------------------------------+
+|  Column   |  Type   | Collation | Nullable |                  Default                   |
++-----------+---------+-----------+----------+--------------------------------------------+
+| rental_id | integer |           | not null | nextval('rentals_rental_id_seq'::regclass) |
++-----------+---------+-----------+----------+--------------------------------------------+
+Indexes:
+    "rentals_pkey" PRIMARY KEY, btree (rental_id)
+
+bikes=> ALTER TABLE rentals ADD COLUMN customer_id INT NOT NULL REFERENCES customers(customer_id);
+ALTER TABLE
+bikes=> ALTER TABLE rentals ADD COLUMN customer_id INT NOT NULL REFERENCES customers(customer_id);
+ERROR:  column "customer_id" of relation "rentals" already exists
+bikes=> \d rentals
+                                   Table "public.rentals"
++-------------+---------+-----------+----------+--------------------------------------------+
+|   Column    |  Type   | Collation | Nullable |                  Default                   |
++-------------+---------+-----------+----------+--------------------------------------------+
+| rental_id   | integer |           | not null | nextval('rentals_rental_id_seq'::regclass) |
+| customer_id | integer |           | not null |                                            |
++-------------+---------+-----------+----------+--------------------------------------------+
+Indexes:
+    "rentals_pkey" PRIMARY KEY, btree (rental_id)
+Foreign-key constraints:
+    "rentals_customer_id_fkey" FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
+
+bikes=> ALTER TABLE rentals ADD COLUMN bike_id INT NOT NULL;
+bikes=> ALTER TABLE
+ALTER TABLE rentals ADD FOREIGN KEY(bike_id) REFERENCES bikes(bike_id);
+ALTER TABLE
+bikes=> \d rentals
+                                   Table "public.rentals"
++-------------+---------+-----------+----------+--------------------------------------------+
+|   Column    |  Type   | Collation | Nullable |                  Default                   |
++-------------+---------+-----------+----------+--------------------------------------------+
+| rental_id   | integer |           | not null | nextval('rentals_rental_id_seq'::regclass) |
+| customer_id | integer |           | not null |                                            |
+| bike_id     | integer |           | not null |                                            |
++-------------+---------+-----------+----------+--------------------------------------------+
+Indexes:
+    "rentals_pkey" PRIMARY KEY, btree (rental_id)
+Foreign-key constraints:
+    "rentals_bike_id_fkey" FOREIGN KEY (bike_id) REFERENCES bikes(bike_id)
+    "rentals_customer_id_fkey" FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
+
+bikes=> ALTER TABLE rentals ADD COLUMN date_returned DATE NOT NULL DEFAULT NOW();
+bikes=> ALTER TABLE
+ALTER TABLE rentals RENAME COLUMN date_returned TO date_rented;
+ALTER TABLE
+bikes=> \d rentals
+                                   Table "public.rentals"
++-------------+---------+-----------+----------+--------------------------------------------+
+|   Column    |  Type   | Collation | Nullable |                  Default                   |
++-------------+---------+-----------+----------+--------------------------------------------+
+| rental_id   | integer |           | not null | nextval('rentals_rental_id_seq'::regclass) |
+| customer_id | integer |           | not null |                                            |
+| bike_id     | integer |           | not null |                                            |
+| date_rented | date    |           | not null | now()                                      |
++-------------+---------+-----------+----------+--------------------------------------------+
+Indexes:
+    "rentals_pkey" PRIMARY KEY, btree (rental_id)
+Foreign-key constraints:
+    "rentals_bike_id_fkey" FOREIGN KEY (bike_id) REFERENCES bikes(bike_id)
+    "rentals_customer_id_fkey" FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
+
+bikes=> 
+bikes=> ^\Quit (core dumped)
+codeally@1f3a9065ddf8:~/project$ psql --username=freecodecamp --dbname=postgres
+Border style is 2.
+Title is " ".
+Pager usage is off.
+psql (12.9 (Ubuntu 12.9-2.pgdg20.04+1))
+Type "help" for help.
+
+postgres=> \c bikes
+You are now connected to database "bikes" as user "freecodecamp".
+bikes=> \d
+                       List of relations
++--------+---------------------------+----------+--------------+
+| Schema |           Name            |   Type   |    Owner     |
++--------+---------------------------+----------+--------------+
+| public | bikes                     | table    | freecodecamp |
+| public | bikes_bike_id_seq         | sequence | freecodecamp |
+| public | customers                 | table    | freecodecamp |
+| public | customers_customer_id_seq | sequence | freecodecamp |
+| public | rentals                   | table    | freecodecamp |
+| public | rentals_rental_id_seq     | sequence | freecodecamp |
++--------+---------------------------+----------+--------------+
+(6 rows)
+
+bikes=> ALTER TABLE rentals ADD COLUMN date_returned DATE;
+ALTER TABLE
+bikes=> \d rentals
+                                    Table "public.rentals"
++---------------+---------+-----------+----------+--------------------------------------------+
+|    Column     |  Type   | Collation | Nullable |                  Default                   |
++---------------+---------+-----------+----------+--------------------------------------------+
+| rental_id     | integer |           | not null | nextval('rentals_rental_id_seq'::regclass) |
+| customer_id   | integer |           | not null |                                            |
+| bike_id       | integer |           | not null |                                            |
+| date_rented   | date    |           | not null | now()                                      |
+| date_returned | date    |           |          |                                            |
++---------------+---------+-----------+----------+--------------------------------------------+
+Indexes:
+    "rentals_pkey" PRIMARY KEY, btree (rental_id)
+Foreign-key constraints:
+    "rentals_bike_id_fkey" FOREIGN KEY (bike_id) REFERENCES bikes(bike_id)
+    "rentals_customer_id_fkey" FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
+
+bikes=> \d
+                       List of relations
++--------+---------------------------+----------+--------------+
+| Schema |           Name            |   Type   |    Owner     |
++--------+---------------------------+----------+--------------+
+| public | bikes                     | table    | freecodecamp |
+| public | bikes_bike_id_seq         | sequence | freecodecamp |
+| public | customers                 | table    | freecodecamp |
+| public | customers_customer_id_seq | sequence | freecodecamp |
+| public | rentals                   | table    | freecodecamp |
+| public | rentals_rental_id_seq     | sequence | freecodecamp |
++--------+---------------------------+----------+--------------+
+(6 rows)
+
+bikes=> \d
+bikes=>                        List of relations
++--------+---------------------------+----------+--------------+
+| Schema |           Name            |   Type   |    Owner     |
++--------+---------------------------+----------+--------------+
+| public | bikes                     | table    | freecodecamp |
+| public | bikes_bike_id_seq         | sequence | freecodecamp |
+| public | customers                 | table    | freecodecamp |
+| public | customers_customer_id_seq | sequence | freecodecamp |
+| public | rentals                   | table    | freecodecamp |
+| public | rentals_rental_id_seq     | sequence | freecodecamp |
++--------+---------------------------+----------+--------------+
+(6 rows)
+
+\d bikes
+bikes=>                                         Table "public.bikes"
++-----------+-----------------------+-----------+----------+----------------------------------------+
+|  Column   |         Type          | Collation | Nullable |                Default                 |
++-----------+-----------------------+-----------+----------+----------------------------------------+
+| bike_id   | integer               |           | not null | nextval('bikes_bike_id_seq'::regclass) |
+| type      | character varying(50) |           | not null |                                        |
+| size      | integer               |           | not null |                                        |
+| available | boolean               |           | not null | true                                   |
++-----------+-----------------------+-----------+----------+----------------------------------------+
+Indexes:
+    "bikes_pkey" PRIMARY KEY, btree (bike_id)
+Referenced by:
+    TABLE "rentals" CONSTRAINT "rentals_bike_id_fkey" FOREIGN KEY (bike_id) REFERENCES bikes(bike_id)
+
+INSERT INTO bikes(type, size) VALUES('Mountain', 27);
+INSERT 0 1
+bikes=> SELECT * FROM bikes;
+bikes=>                      
++---------+----------+------+-----------+
+| bike_id |   type   | size | available |
++---------+----------+------+-----------+
+|       1 | Mountain |   27 | t         |
++---------+----------+------+-----------+
+(1 row)
+
+INSERT INTO bikes(type, size) VALUES('Mountain', 28);
+INSERT 0 1
+bikes=> INSERT INTO bikes(type, size) VALUES('Mountain', 29);
+INSERT 0 1
+bikes=> INSERT INTO bikes(type, size) VALUES('Road', 27);
+INSERT 0 1
+bikes=> SELECT * FROM bikes;
+bikes=>                      
++---------+----------+------+-----------+
+| bike_id |   type   | size | available |
++---------+----------+------+-----------+
+|       1 | Mountain |   27 | t         |
+|       2 | Mountain |   28 | t         |
+|       3 | Mountain |   29 | t         |
+|       4 | Road     |   27 | t         |
++---------+----------+------+-----------+
+(4 rows)
+
+INSERT INTO bikes(type, size) VALUES('Road, 28), VALUES('Road', 29);
+bikes'> '
+bikes(> 
+bikes(> 
+bikes(> 
+bikes(> ;
+bikes(> ;
+bikes(> sdf
+bikes(> sdf
+bikes(> ;;
+bikes(> sdf
+bikes(> ;;;;;
+bikes(> ^C
+bikes=> 
+bikes=> INSERT INTO bikes(type, size) VALUES('Road', 28), VALUES('Road', 29);
+ERROR:  syntax error at or near "VALUES"
+LINE 1: INSERT INTO bikes(type, size) VALUES('Road', 28), VALUES('Ro...
+                                                          ^
+bikes=> INSERT INTO bikes(type, size) VALUES('Road', 28),
+bikes-> VALUES('Road', 29);
+ERROR:  syntax error at or near "VALUES"
+LINE 2: VALUES('Road', 29);
+        ^
+bikes=> INSERT INTO bikes(type, size) VALUES('Road', 28),
+bikes-> VALUES('Road', 29);
+ERROR:  syntax error at or near "VALUES"
+LINE 2: VALUES('Road', 29);
+        ^
+bikes=> INSERT INTO bikes(type, size) VALUES('Road', 28), ('Road', 29);
+bikes=> 
+bikes=> ;
+bikes=> SELECT * FROM bikes
+bikes-> ;
+bikes=> ;
+bikes=> SELECT * FROM bikes;
+bikes=> SELECT * FROM bikes;
+bikes=> ^C
+bikes=> bikes=> SELECT * FROM bikes;
+                     
++---------+----------+------+-----------+
+| bike_id |   type   | size | available |
++---------+----------+------+-----------+
+|       1 | Mountain |   27 | t         |
+|       2 | Mountain |   28 | t         |
+|       3 | Mountain |   29 | t         |
+|       4 | Road     |   27 | t         |
+|       5 | Road     |   28 | t         |
+|       6 | Road     |   29 | t         |
++---------+----------+------+-----------+
+(6 rows)
+
+bikes=> INSERT INTO bikes(type, size) VALUES('BMX', 19), ('BMX', 20), ('BMX', 21);
+bikes=> INSERT 0 3
+SELECT * FROM bikes;
+                     
++---------+----------+------+-----------+
+| bike_id |   type   | size | available |
++---------+----------+------+-----------+
+|       1 | Mountain |   27 | t         |
+|       2 | Mountain |   28 | t         |
+|       3 | Mountain |   29 | t         |
+|       4 | Road     |   27 | t         |
+|       5 | Road     |   28 | t         |
+|       6 | Road     |   29 | t         |
+|       7 | BMX      |   19 | t         |
+|       8 | BMX      |   20 | t         |
+|       9 | BMX      |   21 | t         |
++---------+----------+------+-----------+
+(9 rows)
+
+bikes=> 
+	v
+
+
+
+********************************************************
+		
+		OUT OF ORDER
+
+********************************************************
+
+
+
+codeally@1f3a9065ddf8:~/project$ touch bike-shop.sh
+codeally@1f3a9065ddf8:~/project$ which bash
+/usr/bin/bash
+codeally@1f3a9065ddf8:~/project$ chmod +x bike-shop.sh
+codeally@1f3a9065ddf8:~/project$ ./bike-shop.sh
+
+~~~~~ Bike Rental Shop ~~~~~
+
+codeally@1f3a9065ddf8:~/project$ ./bike-shop.sh
+
+~~~~~ Bike Rental Shop ~~~~~
+
+How may I help you?
+codeally@1f3a9065ddf8:~/project$ ./bike-shop.sh
+
+~~~~~ Bike Rental Shop ~~~~~
+
+How may I help you?
+
+1. Rent a bike
+2. Return a bike
+3. Exit
+codeally@1f3a9065ddf8:~/project$ ./bike-shop.sh
+
+~~~~~ Bike Rental Shop ~~~~~
+
+How may I help you?
+
+1. Rent a bike
+2. Return a bike
+3. Exit
+1
+Rent Menu
+codeally@1f3a9065ddf8:~/project$ ./bike-shop.sh
+
+~~~~~ Bike Rental Shop ~~~~~
+
+How may I help you?
+
+1. Rent a bike
+2. Return a bike
+3. Exit
+75
+
+Please enter a valid option.
+How may I help you?
+
+1. Rent a bike
+2. Return a bike
+3. Exit
+24
+
+Please enter a valid option.
+How may I help you?
+
+1. Rent a bike
+2. Return a bike
+3. Exit
+34
+
+Please enter a valid option.
+How may I help you?
+
+1. Rent a bike
+2. Return a bike
+3. Exit
+2222
+
+Please enter a valid option.
+How may I help you?
+
+1. Rent a bike
+2. Return a bike
+3. Exit
+3
+
+Thank you for stopping in.
+
+codeally@1f3a9065ddf8:~/project$ ./bike-shop.sh
+
+~~~~~ Bike Rental Shop ~~~~~
+
+How may I help you?
+
+1. Rent a bike
+2. Return a bike
+3. Exit
+1
+AVAILABLE_BIKES
+codeally@1f3a9065ddf8:~/project$ ./bike-shop.sh
+
+~~~~~ Bike Rental Shop ~~~~~
+
+How may I help you?
+
+1. Rent a bike
+2. Return a bike
+3. Exit
+1
+AVAILABLE_BIKES
+codeally@1f3a9065ddf8:~/project$ ./bike-shop.sh
+
+~~~~~ Bike Rental Shop ~~~~~
+
+How may I help you?
+
+1. Rent a bike
+2. Return a bike
+3. Exit
+1
+1 | Mountain | 27 2 | Mountain | 28 3 | Mountain | 29 4 | Road | 27 5 | Road | 28 6 | Road | 29 7 | BMX | 19 8 | BMX | 20 9 | BMX | 21
+codeally@1f3a9065ddf8:~/project$ ./bike-shop.sh
+
+~~~~~ Bike Rental Shop ~~~~~
+
+How may I help you?
+
+1. Rent a bike
+2. Return a bike
+3. Exit
+1
+       1 | Mountain |   27
+       2 | Mountain |   28
+       3 | Mountain |   29
+       4 | Road     |   27
+       5 | Road     |   28
+       6 | Road     |   29
+       7 | BMX      |   19
+       8 | BMX      |   20
+       9 | BMX      |   21
+codeally@1f3a9065ddf8:~/project$ ./bike-shop.sh
+
+~~~~~ Bike Rental Shop ~~~~~
+
+How may I help you?
+
+1. Rent a bike
+2. Return a bike
+3. Exit
+1
+       1 | Mountain |   27
+       2 | Mountain |   28
+       3 | Mountain |   29
+       4 | Road     |   27
+       5 | Road     |   28
+       6 | Road     |   29
+       7 | BMX      |   19
+       8 | BMX      |   20
+       9 | BMX      |   21
+codeally@1f3a9065ddf8:~/project$ ./bike-shop.sh
+
+~~~~~ Bike Rental Shop ~~~~~
+
+How may I help you?
+
+1. Rent a bike
+2. Return a bike
+3. Exit
+1
+
+codeally@1f3a9065ddf8:~/project$ ./bike-shop.sh
+
+~~~~~ Bike Rental Shop ~~~~~
+
+How may I help you?
+
+1. Rent a bike
+2. Return a bike
+3. Exit
+1
+
+
+Sorry, we don't have any bikes available right now.
+How may I help you?
+
+1. Rent a bike
+2. Return a bike
+3. Exit
+exit
+
+Please enter a valid option.
+How may I help you?
+
+1. Rent a bike
+2. Return a bike
+3. Exit
+3
+
+Thank you for stopping in.
+
+codeally@1f3a9065ddf8:~/project$ 
+	v
+
+
+
+#!/bin/bash
+PSQL="psql -X --username=freecodecamp --dbname=bikes --tuples-only -c"
+
+echo -e "\n~~~~~ Bike Rental Shop ~~~~~\n"
+
+MAIN_MENU()
+{
+  if [[ $1 ]]
+  then
+    echo -e "\n$1"
+  fi
+  
+  echo How may I help you?
+  echo -e "\n1. Rent a bike\n2. Return a bike\n3. Exit"
+  read MAIN_MENU_SELECTION
+  case $MAIN_MENU_SELECTION in 
+    1) RENT_MENU ;;
+    2) RETURN_MENU ;;
+    3) EXIT ;;
+    *) MAIN_MENU "Please enter a valid option." ;;
+  esac
+}
+
+RENT_MENU()
+{
+  #get available bikes
+  AVAILABLE_BIKES=$($PSQL "SELECT bike_id, type, size FROM bikes WHERE available='t' ORDER BY bike_id")
+  #echo "$AVAILABLE_BIKES"
+  #if no bikes available
+  if [[ -z $AVAILABLE_BIKES ]]
+  then
+    #send to main menu
+    MAIN_MENU "Sorry, we don't have any bikes available right now."
+
+    else
+      #display available bikes
+      echo -e "\nHere are the bikes we have available:"
+      echo "$AVAILABLE_BIKES"
+      #ask for bike to rent
+      #if input is not a number
+      #send to main menu
+  fi
+  
+
+}
+
+RETURN_MENU()
+{
+  echo Return Menu
+}
+
+EXIT()
+{
+  echo -e "\nThank you for stopping in.\n"
+}
+MAIN_MENU
+	v
+
+
+
+bikes=> UPDATE bikes SET available="false" WHERE available="true";
+ERROR:  column "true" does not exist
+LINE 1: UPDATE bikes SET available="false" WHERE available="true";
+                                                           ^
+HINT:  Perhaps you meant to reference the column "bikes.type".
+bikes=> UPDATE bikes SET available=false WHERE available=true;
+bikes=> UPDATE 9
+UPDATE bikes SET available=true WHERE type!='BMX' AND available=false;
+UPDATE 6
+bikes=> 
+	v
+
+
+
+codeally@1f3a9065ddf8:~/project$ ./bike-shop.sh
+
+~~~~~ Bike Rental Shop ~~~~~
+
+How may I help you?
+
+1. Rent a bike
+2. Return a bike
+3. Exit
+1
+
+Here are the bikes we have available:
+       1 | Mountain |   27
+       2 | Mountain |   28
+       3 | Mountain |   29
+       4 | Road     |   27
+       5 | Road     |   28
+       6 | Road     |   29
+codeally@1f3a9065ddf8:~/project$ ./bike-shop.sh
+
+~~~~~ Bike Rental Shop ~~~~~
+
+How may I help you?
+
+1. Rent a bike
+2. Return a bike
+3. Exit
+1
+
+Here are the bikes we have available:
+1 Mountain 27
+2 Mountain 28
+3 Mountain 29
+4 Road 27
+5 Road 28
+6 Road 29
+codeally@1f3a9065ddf8:~/project$ ./bike-shop.sh
+
+~~~~~ Bike Rental Shop ~~~~~
+
+How may I help you?
+
+1. Rent a bike
+2. Return a bike
+3. Exit
+1
+
+Here are the bikes we have available:
+1) 27" Mountain Bike
+2) 28" Mountain Bike
+3) 29" Mountain Bike
+4) 27" Road Bike
+5) 28" Road Bike
+6) 29" Road Bike
+codeally@1f3a9065ddf8:~/project$ [[ a =~ [0-9] ]]; echo $?
+1
+codeally@1f3a9065ddf8:~/project$ [[ a1 =~ [0-9] ]]; echo $?
+0
+codeally@1f3a9065ddf8:~/project$ [[ a1 =~ ^[0-9]$ ]]; echo $?
+1
+codeally@1f3a9065ddf8:~/project$ [[ 1 =~ ^[0-9]$ ]]; echo $?
+0
+codeally@1f3a9065ddf8:~/project$ 
+	v
+
+
+
+#!/bin/bash
+PSQL="psql -X --username=freecodecamp --dbname=bikes --tuples-only -c"
+
+echo -e "\n~~~~~ Bike Rental Shop ~~~~~\n"
+
+MAIN_MENU()
+{
+  if [[ $1 ]]
+  then
+    echo -e "\n$1"
+  fi
+  
+  echo How may I help you?
+  echo -e "\n1. Rent a bike\n2. Return a bike\n3. Exit"
+  read MAIN_MENU_SELECTION
+  case $MAIN_MENU_SELECTION in 
+    1) RENT_MENU ;;
+    2) RETURN_MENU ;;
+    3) EXIT ;;
+    *) MAIN_MENU "Please enter a valid option." ;;
+  esac
+}
+
+RENT_MENU()
+{
+  #get available bikes
+  AVAILABLE_BIKES=$($PSQL "SELECT bike_id, type, size FROM bikes WHERE available='t' ORDER BY bike_id")
+  #echo "$AVAILABLE_BIKES"
+  #if no bikes available
+  if [[ -z $AVAILABLE_BIKES ]]
+  then
+    #send to main menu
+    MAIN_MENU "Sorry, we don't have any bikes available right now."
+
+    else
+      #display available bikes
+      echo -e "\nHere are the bikes we have available:"
+      echo "$AVAILABLE_BIKES" | while read BIKE_ID BAR TYPE BAR SIZE
+      do
+        echo "$BIKE_ID) $SIZE\" $TYPE Bike"
+      done
+      #ask for bike to rent
+      echo -e "\nWhich one would you like to rent?"
+      read BIKE_ID_TO_RENT
+      
+      #if input is not a number
+      #send to main menu
+  fi
+  
+
+}
+
+RETURN_MENU()
+{
+  echo Return Menu
+}
+
+EXIT()
+{
+  echo -e "\nThank you for stopping in.\n"
+}
+MAIN_MENU
+	v
+
+
+
+codeally@1f3a9065ddf8:~/project$ [[ 11 =~ ^[0-9]$ ]]; echo $?
+1
+codeally@1f3a9065ddf8:~/project$ [[ 11 =~ ^[0-9]+$ ]]; echo $?
+0
+codeally@1f3a9065ddf8:~/project$ ![[ 11 =~ ^[0-9]+$ ]]; echo $?
+[[ 11 =~ ^[0-9]+$ ]]; echo $? 11 =~ ^[0-9]+$ ]]; echo $?
+0 11 =~ ^[0-9]+$ ]]
+0
+codeally@1f3a9065ddf8:~/project$ [[ ! 11 =~ ^[0-9]+$ ]]; echo $?
+1
+codeally@1f3a9065ddf8:~/project$ 
+	v
+
+
+
+#!/bin/bash
+PSQL="psql -X --username=freecodecamp --dbname=bikes --tuples-only -c"
+
+echo -e "\n~~~~~ Bike Rental Shop ~~~~~\n"
+
+MAIN_MENU()
+{
+  if [[ $1 ]]
+  then
+    echo -e "\n$1"
+  fi
+  
+  echo How may I help you?
+  echo -e "\n1. Rent a bike\n2. Return a bike\n3. Exit"
+  read MAIN_MENU_SELECTION
+  case $MAIN_MENU_SELECTION in 
+    1) RENT_MENU ;;
+    2) RETURN_MENU ;;
+    3) EXIT ;;
+    *) MAIN_MENU "Please enter a valid option." ;;
+  esac
+}
+
+RENT_MENU()
+{
+  #get available bikes
+  AVAILABLE_BIKES=$($PSQL "SELECT bike_id, type, size FROM bikes WHERE available='t' ORDER BY bike_id")
+  #echo "$AVAILABLE_BIKES"
+  #if no bikes available
+  if [[ -z $AVAILABLE_BIKES ]]
+  then
+    #send to main menu
+    MAIN_MENU "Sorry, we don't have any bikes available right now."
+
+    else
+      #display available bikes
+      echo -e "\nHere are the bikes we have available:"
+      echo "$AVAILABLE_BIKES" | while read BIKE_ID BAR TYPE BAR SIZE
+      do
+        echo "$BIKE_ID) $SIZE\" $TYPE Bike"
+      done
+      #ask for bike to rent
+      echo -e "\nWhich one would you like to rent?"
+      read BIKE_ID_TO_RENT
+
+      #if input is not a number
+      if [[ ! $BIKE_ID_TO_RENT =~ ^[0-9]+$ ]]
+      then
+        #send to main menu
+        MAIN_MENU "That is not a valid bike number."
+      fi
+  fi
+  
+
+}
+
+RETURN_MENU()
+{
+  echo Return Menu
+}
+
+EXIT()
+{
+  echo -e "\nThank you for stopping in.\n"
+}
+MAIN_MENU
+	v
+
+
+
+codeally@9224d9eeead5:~/project$ ./bike-shop.sh
+
+~~~~~ Bike Rental Shop ~~~~~
+
+How may I help you?
+
+1. Rent a bike
+2. Return a bike
+3. Exit
+1
+
+Here are the bikes we have available:
+1) 27" Mountain Bike
+2) 28" Mountain Bike
+3) 29" Mountain Bike
+4) 27" Road Bike
+5) 28" Road Bike
+6) 29" Road Bike
+
+Which one would you like to rent?
+7
+ERROR:  unterminated quoted string at or near "'"
+LINE 1: ...ECT available FROM bikes WHERE bike_id=7 AND available=true'
+                                                                      ^
+
+codeally@9224d9eeead5:~/project$ ./bike-shop.sh
+
+~~~~~ Bike Rental Shop ~~~~~
+
+How may I help you?
+
+1. Rent a bike
+2. Return a bike
+3. Exit
+1
+
+Here are the bikes we have available:
+1) 27" Mountain Bike
+2) 28" Mountain Bike
+3) 29" Mountain Bike
+4) 27" Road Bike
+5) 28" Road Bike
+6) 29" Road Bike
+
+Which one would you like to rent?
+2
+ERROR:  unterminated quoted string at or near "'"
+LINE 1: ...ECT available FROM bikes WHERE bike_id=2 AND available=true'
+                                                                      ^
+
+codeally@9224d9eeead5:~/project$ ./bike-shop.sh
+
+~~~~~ Bike Rental Shop ~~~~~
+
+How may I help you?
+
+1. Rent a bike
+2. Return a bike
+3. Exit
+1
+
+Here are the bikes we have available:
+1) 27" Mountain Bike
+2) 28" Mountain Bike
+3) 29" Mountain Bike
+4) 27" Road Bike
+5) 28" Road Bike
+6) 29" Road Bike
+
+Which one would you like to rent?
+7
+
+codeally@9224d9eeead5:~/project$ ./bike-shop.sh
+
+~~~~~ Bike Rental Shop ~~~~~
+
+How may I help you?
+
+1. Rent a bike
+2. Return a bike
+3. Exit
+1
+
+Here are the bikes we have available:
+1) 27" Mountain Bike
+2) 28" Mountain Bike
+3) 29" Mountain Bike
+4) 27" Road Bike
+5) 28" Road Bike
+6) 29" Road Bike
+
+Which one would you like to rent?
+2
+t
+codeally@9224d9eeead5:~/project$ ./bike-shop.sh
+
+~~~~~ Bike Rental Shop ~~~~~
+
+How may I help you?
+
+1. Rent a bike
+2. Return a bike
+3. Exit
+1
+
+Here are the bikes we have available:
+1) 27" Mountain Bike
+2) 28" Mountain Bike
+3) 29" Mountain Bike
+4) 27" Road Bike
+5) 28" Road Bike
+6) 29" Road Bike
+
+Which one would you like to rent?
+7
+
+That bike is not available.
+How may I help you?
+
+1. Rent a bike
+2. Return a bike
+3. Exit
+3
+
+Thank you for stopping in.
+
+codeally@9224d9eeead5:~/project$ 
+	v
+
+
+
+#!/bin/bash
+PSQL="psql -X --username=freecodecamp --dbname=bikes --tuples-only -c"
+
+echo -e "\n~~~~~ Bike Rental Shop ~~~~~\n"
+
+MAIN_MENU()
+{
+  if [[ $1 ]]
+  then
+    echo -e "\n$1"
+  fi
+  
+  echo How may I help you?
+  echo -e "\n1. Rent a bike\n2. Return a bike\n3. Exit"
+  read MAIN_MENU_SELECTION
+  case $MAIN_MENU_SELECTION in 
+    1) RENT_MENU ;;
+    2) RETURN_MENU ;;
+    3) EXIT ;;
+    *) MAIN_MENU "Please enter a valid option." ;;
+  esac
+}
+
+RENT_MENU()
+{
+  #get available bikes
+  AVAILABLE_BIKES=$($PSQL "SELECT bike_id, type, size FROM bikes WHERE available='t' ORDER BY bike_id")
+  #echo "$AVAILABLE_BIKES"
+  #if no bikes available
+  if [[ -z $AVAILABLE_BIKES ]]
+  then
+    #send to main menu
+    MAIN_MENU "Sorry, we don't have any bikes available right now."
+
+    else
+      #display available bikes
+      echo -e "\nHere are the bikes we have available:"
+      echo "$AVAILABLE_BIKES" | while read BIKE_ID BAR TYPE BAR SIZE
+      do
+        echo "$BIKE_ID) $SIZE\" $TYPE Bike"
+      done
+      #ask for bike to rent
+      echo -e "\nWhich one would you like to rent?"
+      read BIKE_ID_TO_RENT
+
+      #if input is not a number
+      if [[ ! $BIKE_ID_TO_RENT =~ ^[0-9]+$ ]]
+      then
+        #send to main menu
+        MAIN_MENU "That is not a valid bike number."
+
+        else
+          #get bike availability
+          BIKE_AVAILABILITY=$($PSQL "SELECT available FROM bikes WHERE bike_id=$BIKE_ID_TO_RENT AND available=true")  #bike_id is to only return the chosen row
+          #echo $BIKE_AVAILABILITY
+          #if not available
+          if [[ -z $BIKE_AVAILABILITY ]]
+          then
+            #send to main menu
+            MAIN_MENU "That bike is not available."
+          fi
+      fi
+  fi
+  
+
+}
+
+RETURN_MENU()
+{
+  echo Return Menu
+}
+
+EXIT()
+{
+  echo -e "\nThank you for stopping in.\n"
+}
+MAIN_MENU
+	v
+
+
+
+codeally@9224d9eeead5:~/project$ ./bike-shop.sh
+
+~~~~~ Bike Rental Shop ~~~~~
+
+How may I help you?
+
+1. Rent a bike
+2. Return a bike
+3. Exit
+1 
+
+Here are the bikes we have available:
+1) 27" Mountain Bike
+2) 28" Mountain Bike
+3) 29" Mountain Bike
+4) 27" Road Bike
+5) 28" Road Bike
+6) 29" Road Bike
+7) 19" BMX Bike
+8) 20" BMX Bike
+9) 21" BMX Bike
+
+Which one would you like to rent?
+7
+
+What's your phone number?
+555-5555
+
+What's your name?
+Me
+codeally@9224d9eeead5:~/project$ ./bike-shop.sh
+
+~~~~~ Bike Rental Shop ~~~~~
+
+How may I help you?
+
+1. Rent a bike
+2. Return a bike
+3. Exit
+1
+
+Here are the bikes we have available:
+1) 27" Mountain Bike
+2) 28" Mountain Bike
+3) 29" Mountain Bike
+4) 27" Road Bike
+5) 28" Road Bike
+6) 29" Road Bike
+7) 19" BMX Bike
+8) 20" BMX Bike
+9) 21" BMX Bike
+
+Which one would you like to rent?
+12
+
+That bike is not available.
+How may I help you?
+
+1. Rent a bike
+2. Return a bike
+3. Exit
+3
+
+Thank you for stopping in.
+
+codeally@9224d9eeead5:~/project$ ./bike-shop.sh
+
+~~~~~ Bike Rental Shop ~~~~~
+
+How may I help you?
+
+1. Rent a bike
+2. Return a bike
+3. Exit
+1
+
+Here are the bikes we have available:
+1) 27" Mountain Bike
+2) 28" Mountain Bike
+3) 29" Mountain Bike
+4) 27" Road Bike
+5) 28" Road Bike
+6) 29" Road Bike
+7) 19" BMX Bike
+8) 20" BMX Bike
+9) 21" BMX Bike
+
+Which one would you like to rent?
+1
+
+What's your phone number?
+555-5555
+codeally@9224d9eeead5:~/project$ ./bike-shop.sh
+
+~~~~~ Bike Rental Shop ~~~~~
+
+How may I help you?
+
+1. Rent a bike
+2. Return a bike
+3. Exit
+1
+
+Here are the bikes we have available:
+2) 28" Mountain Bike
+3) 29" Mountain Bike
+4) 27" Road Bike
+5) 28" Road Bike
+6) 29" Road Bike
+7) 19" BMX Bike
+8) 20" BMX Bike
+9) 21" BMX Bike
+
+Which one would you like to rent?
+2
+
+What's your phone number?
+555-5555
+28 | Mountain
+codeally@9224d9eeead5:~/project$ echo '28 | Mountain' | sed's/ /=/g'
+bash: seds/ /=/g: No such file or directory
+codeally@9224d9eeead5:~/project$ echo '28 | Mountain' | sed 's/ /=/g'
+28=|=Mountain
+codeally@9224d9eeead5:~/project$ echo '28|Mountain' | sed 's/ /=/g'
+28|Mountain
+codeally@9224d9eeead5:~/project$ echo '28|Mountain' | sed 's//=/g'
+sed: -e expression #1, char 0: no previous regular expression
+codeally@9224d9eeead5:~/project$ echo '28 | Mountain' | sed 's/ //g'
+28|Mountain
+codeally@9224d9eeead5:~/project$ echo '28 | Mountain' | sed 's/ //'
+28| Mountain
+codeally@9224d9eeead5:~/project$ echo '28 | Mountain' | sed 's/ /\1/'
+sed: -e expression #1, char 7: invalid reference \1 on `s' command's RHS
+codeally@9224d9eeead5:~/project$ echo '28 | Mountain' | sed 's/' '/\1/'
+sed: -e expression #1, char 2: unterminated `s' command
+codeally@9224d9eeead5:~/project$ echo '28 | Mountain' | sed 's/' '//'
+sed: -e expression #1, char 2: unterminated `s' command
+codeally@9224d9eeead5:~/project$ echo '28 | Mountain' | sed 's/( ) //'
+28 | Mountain
+codeally@9224d9eeead5:~/project$ echo '28 | Mountain' | sed 's/( )( )/\2/'
+sed: -e expression #1, char 12: invalid reference \2 on `s' command's RHS
+codeally@9224d9eeead5:~/project$ echo '28 | Mountain' | sed 's/( )( )/\1/'
+sed: -e expression #1, char 12: invalid reference \1 on `s' command's RHS
+codeally@9224d9eeead5:~/project$ echo '28 | Mountain' | sed 's/( ),( )/\1/'
+sed: -e expression #1, char 13: invalid reference \1 on `s' command's RHS
+codeally@9224d9eeead5:~/project$ echo '28 | Mountain' | sed 's/( )|( )/\1/'
+sed: -e expression #1, char 13: invalid reference \1 on `s' command's RHS
+codeally@9224d9eeead5:~/project$ echo '28 | Mountain' | sed 's/ |//'
+28 Mountain
+codeally@9224d9eeead5:~/project$ echo '28 | Mountain' | sed 's/ |/\" /'
+28"  Mountain
+codeally@9224d9eeead5:~/project$ echo '28 | Mountain' | sed 's/ |/\"/'
+28" Mountain
+codeally@9224d9eeead5:~/project$ echo '28 | Mountain' | sed 's/ |/\"/'
+28" Mountain
+codeally@9224d9eeead5:~/project$ echo '28 | Mountain' | sed 's/ |/"/'
+28" Mountain
+codeally@9224d9eeead5:~/project$ ./bike_shop.sh
+bash: ./bike_shop.sh: No such file or directory
+codeally@9224d9eeead5:~/project$ ./bike-shop.sh
+
+~~~~~ Bike Rental Shop ~~~~~
+
+How may I help you?
+
+1. Rent a bike
+2. Return a bike
+3. Exit
+1
+
+Here are the bikes we have available:
+3) 29" Mountain Bike
+4) 27" Road Bike
+5) 28" Road Bike
+6) 29" Road Bike
+7) 19" BMX Bike
+8) 20" BMX Bike
+9) 21" BMX Bike
+
+Which one would you like to rent?
+4
+
+What's your phone number?
+555-5555
+27" Road
+codeally@9224d9eeead5:~/project$ ./bike-shop.sh
+
+~~~~~ Bike Rental Shop ~~~~~
+
+How may I help you?
+
+1. Rent a bike
+2. Return a bike
+3. Exit
+1
+
+Here are the bikes we have available:
+3) 29" Mountain Bike
+5) 28" Road Bike
+6) 29" Road Bike
+7) 19" BMX Bike
+8) 20" BMX Bike
+9) 21" BMX Bike
+
+Which one would you like to rent?
+3
+
+What's your phone number?
+555-5555
+
+I have put you down for the 29" Mountain Bike,  Me.
+How may I help you?
+
+1. Rent a bike
+2. Return a bike
+3. Exit
+3
+
+Thank you for stopping in.
+
+codeally@9224d9eeead5:~/project$ 
+	v
+
+
+
+bikes=> \d
+                       List of relations
++--------+---------------------------+----------+--------------+
+| Schema |           Name            |   Type   |    Owner     |
++--------+---------------------------+----------+--------------+
+| public | bikes                     | table    | freecodecamp |
+| public | bikes_bike_id_seq         | sequence | freecodecamp |
+| public | customers                 | table    | freecodecamp |
+| public | customers_customer_id_seq | sequence | freecodecamp |
+| public | rentals                   | table    | freecodecamp |
+| public | rentals_rental_id_seq     | sequence | freecodecamp |
++--------+---------------------------+----------+--------------+
+(6 rows)
+
+bikes=> UPDATE bikes SET available=t WHERE available=f;
+ERROR:  column "f" does not exist
+LINE 1: UPDATE bikes SET available=t WHERE available=f;
+                                                     ^
+bikes=> UPDATE bikes SET available=true WHERE available=false;
+UPDATE 3
+bikes=> SELECT * FROM customers
+bikes-> ;
+               
++-------------+-------+------+
+| customer_id | phone | name |
++-------------+-------+------+
++-------------+-------+------+
+(0 rows)
+
+bikes=> SELECT * FROM customers;
+                 
++-------------+----------+------+
+| customer_id |  phone   | name |
++-------------+----------+------+
+|           1 | 555-5555 | Me   |
++-------------+----------+------+
+(1 row)
+
+bikes=> SELECT * FROM rentals;
+                                  
++-----------+-------------+---------+-------------+---------------+
+| rental_id | customer_id | bike_id | date_rented | date_returned |
++-----------+-------------+---------+-------------+---------------+
++-----------+-------------+---------+-------------+---------------+
+(0 rows)
+
+bikes=> SELECT * FROM bikes;
+                     
++---------+----------+------+-----------+
+| bike_id |   type   | size | available |
++---------+----------+------+-----------+
+|       1 | Mountain |   27 | t         |
+|       2 | Mountain |   28 | t         |
+|       3 | Mountain |   29 | t         |
+|       4 | Road     |   27 | t         |
+|       5 | Road     |   28 | t         |
+|       6 | Road     |   29 | t         |
+|       7 | BMX      |   19 | t         |
+|       8 | BMX      |   20 | t         |
+|       9 | BMX      |   21 | t         |
++---------+----------+------+-----------+
+(9 rows)
+
+bikes=> SELECT * FROM rentals;
+                                  
++-----------+-------------+---------+-------------+---------------+
+| rental_id | customer_id | bike_id | date_rented | date_returned |
++-----------+-------------+---------+-------------+---------------+
++-----------+-------------+---------+-------------+---------------+
+(0 rows)
+
+bikes=> 
+bikes=> SELECT * FROM rentals;
+bikes=>                                   
++-----------+-------------+---------+-------------+---------------+
+| rental_id | customer_id | bike_id | date_rented | date_returned |
++-----------+-------------+---------+-------------+---------------+
++-----------+-------------+---------+-------------+---------------+
+(0 rows)
+
+SELECT * FROM bikes;
+bikes=>                      
++---------+----------+------+-----------+
+| bike_id |   type   | size | available |
++---------+----------+------+-----------+
+|       1 | Mountain |   27 | t         |
+|       2 | Mountain |   28 | t         |
+|       3 | Mountain |   29 | t         |
+|       4 | Road     |   27 | t         |
+|       5 | Road     |   28 | t         |
+|       6 | Road     |   29 | t         |
+|       7 | BMX      |   19 | t         |
+|       8 | BMX      |   20 | t         |
+|       9 | BMX      |   21 | t         |
++---------+----------+------+-----------+
+(9 rows)
+
+SELECT * FROM rentals;
+                                  
++-----------+-------------+---------+-------------+---------------+
+| rental_id | customer_id | bike_id | date_rented | date_returned |
++-----------+-------------+---------+-------------+---------------+
+|         1 |           1 |       1 | 2022-08-09  |               |
++-----------+-------------+---------+-------------+---------------+
+(1 row)
+
+bikes=> SELECT * FROM bikes;
+                     
++---------+----------+------+-----------+
+| bike_id |   type   | size | available |
++---------+----------+------+-----------+
+|       2 | Mountain |   28 | t         |
+|       3 | Mountain |   29 | t         |
+|       4 | Road     |   27 | t         |
+|       5 | Road     |   28 | t         |
+|       6 | Road     |   29 | t         |
+|       7 | BMX      |   19 | t         |
+|       8 | BMX      |   20 | t         |
+|       9 | BMX      |   21 | t         |
+|       1 | Mountain |   27 | f         |
++---------+----------+------+-----------+
+(9 rows)
+
+bikes=> SELECT 
+bikes-> * FROM bikes ORDER BY bike_id;
+bikes=>                      
++---------+----------+------+-----------+
+| bike_id |   type   | size | available |
++---------+----------+------+-----------+
+|       1 | Mountain |   27 | f         |
+|       2 | Mountain |   28 | t         |
+|       3 | Mountain |   29 | t         |
+|       4 | Road     |   27 | t         |
+|       5 | Road     |   28 | t         |
+|       6 | Road     |   29 | t         |
+|       7 | BMX      |   19 | t         |
+|       8 | BMX      |   20 | t         |
+|       9 | BMX      |   21 | t         |
++---------+----------+------+-----------+
+(9 rows)
+	v
+
+
+
+#!/bin/bash
+PSQL="psql -X --username=freecodecamp --dbname=bikes --tuples-only -c"
+
+echo -e "\n~~~~~ Bike Rental Shop ~~~~~\n"
+
+MAIN_MENU()
+{
+  if [[ $1 ]]
+  then
+    echo -e "\n$1"
+  fi
+  
+  echo How may I help you?
+  echo -e "\n1. Rent a bike\n2. Return a bike\n3. Exit"
+  read MAIN_MENU_SELECTION
+  case $MAIN_MENU_SELECTION in 
+    1) RENT_MENU ;;
+    2) RETURN_MENU ;;
+    3) EXIT ;;
+    *) MAIN_MENU "Please enter a valid option." ;;
+  esac
+}
+
+RENT_MENU()
+{
+  #get available bikes
+  AVAILABLE_BIKES=$($PSQL "SELECT bike_id, type, size FROM bikes WHERE available='t' ORDER BY bike_id")
+  #echo "$AVAILABLE_BIKES"
+  #if no bikes available
+  if [[ -z $AVAILABLE_BIKES ]]
+  then
+    #send to main menu
+    MAIN_MENU "Sorry, we don't have any bikes available right now."
+
+    else
+      #display available bikes
+      echo -e "\nHere are the bikes we have available:"
+      echo "$AVAILABLE_BIKES" | while read BIKE_ID BAR TYPE BAR SIZE
+      do
+        echo "$BIKE_ID) $SIZE\" $TYPE Bike"
+      done
+      #ask for bike to rent
+      echo -e "\nWhich one would you like to rent?"
+      read BIKE_ID_TO_RENT
+
+      #if input is not a number
+      if [[ ! $BIKE_ID_TO_RENT =~ ^[0-9]+$ ]]
+      then
+        #send to main menu
+        MAIN_MENU "That is not a valid bike number."
+
+        else
+          #get bike availability
+          BIKE_AVAILABILITY=$($PSQL "SELECT available FROM bikes WHERE bike_id=$BIKE_ID_TO_RENT AND available=true")  #bike_id is to only return the chosen row
+          #echo $BIKE_AVAILABILITY
+          #if not available
+          if [[ -z $BIKE_AVAILABILITY ]]
+          then
+            #send to main menu
+            MAIN_MENU "That bike is not available."
+
+              else
+                #get customer info
+                echo -e "\nWhat's your phone number?"
+                read PHONE_NUMBER
+                CUSTOMER_NAME=$($PSQL "SELECT name FROM customers WHERE phone='$PHONE_NUMBER'")
+                #if customer doesn't exist
+                if [[ -z $CUSTOMER_NAME ]]
+                then
+                  #get new customer name
+                  echo -e "\nWhat's your name?"
+                  read CUSTOMER_NAME
+                  #insert new customer
+                  INSERT_CUSTOMER_RESULT=$($PSQL "INSERT INTO customers(phone, name) VALUES('$PHONE_NUMBER', '$CUSTOMER_NAME')")
+                fi
+
+                #get customer_id
+                CUSTOMER_ID=$($PSQL "SELECT customer_id FROM customers WHERE phone='$PHONE_NUMBER'")
+                #insert bike rental
+                INSERT_RENTAL_RESULT=$($PSQL "INSERT INTO rentals(customer_id, bike_id) VALUES('$CUSTOMER_ID', $BIKE_ID_TO_RENT)")
+                #set bike availability to false
+                SET_TO_FALSE_RESULT=$($PSQL "UPDATE bikes SET available=false WHERE bike_id=$BIKE_ID_TO_RENT")
+                #get bike info
+                BIKE_INFO=$($PSQL "SELECT size, type FROM bikes WHERE bike_id=$BIKE_ID_TO_RENT")
+                BIKE_INFO_FORMATTED=$(echo $BIKE_INFO | sed 's/ |/"/')    #????What does the $ do here???? Since we're saving the result; we need to be able to call the $BIKE_INFO??? {??WHAT ALLOWS IT TO EXECUTE??}
+                #send to main menu
+                MAIN_MENU "I have put you down for the $BIKE_INFO_FORMATTED Bike, $CUSTOMER_NAME."
+          fi
+      fi
+  fi
+  
+
+}
+
+RETURN_MENU()
+{
+  echo Return Menu
+}
+
+EXIT()
+{
+  echo -e "\nThank you for stopping in.\n"
+}
+MAIN_MENU
+	v
+
+
+
+codeally@9224d9eeead5:~/project$ echo ' M e '
+ M e 
+codeally@9224d9eeead5:~/project$ echo "$(echo ' M e ')."
+ M e .
+codeally@9224d9eeead5:~/project$ echo "$(echo ' M e ' | sed 's/ (M)/\1/')."
+sed: -e expression #1, char 10: invalid reference \1 on `s' command's RHS
+.
+codeally@9224d9eeead5:~/project$ echo "$(echo ' M e ' | sed 's/ M/M/')."
+M e .
+codeally@9224d9eeead5:~/project$ echo "$(echo ' M e ' | sed 's/ //')."
+M e .
+codeally@9224d9eeead5:~/project$ echo "$(echo ' M e ' | sed 's/ //g')."
+Me.
+codeally@9224d9eeead5:~/project$ echo "$(echo ' M e ' | sed 's/^ //g')."
+M e .
+codeally@9224d9eeead5:~/project$ echo "$(echo '   M e ' | sed 's/^ //g')."
+  M e .
+codeally@9224d9eeead5:~/project$ echo "$(echo '   M e ' | sed 's/^ *//g')."
+M e .
+codeally@9224d9eeead5:~/project$ echo "$(echo '   M e ' | sed 's/ $//g')."
+   M e.
+codeally@9224d9eeead5:~/project$ echo "$(echo '   M e   ' | sed 's/ $//g')."
+   M e  .
+codeally@9224d9eeead5:~/project$ echo "$(echo '   M e   ' | sed 's/ $*//g')."
+Me.
+codeally@9224d9eeead5:~/project$ echo "$(echo '   M e   ' | sed 's/* $//g')."
+   M e   .
+codeally@9224d9eeead5:~/project$ echo "$(echo '   M e   ' | sed 's/$ *//g')."
+   M e   .
+codeally@9224d9eeead5:~/project$ echo "$(echo '   M e   ' | sed 's/ $ *//g')."
+   M e   .
+codeally@9224d9eeead5:~/project$ echo "$(echo '   M e   ' | sed 's/ *$//g')."
+   M e.
+codeally@9224d9eeead5:~/project$ echo "$(echo '   M e   ' | sed 's/^ *| *$//g')."
+   M e   .
+codeally@9224d9eeead5:~/project$ man sed
+codeally@9224d9eeead5:~/project$ echo "$(echo '   M e   ' | sed -E 's/^ *| *$//g')."
+M e.
+codeally@9224d9eeead5:~/project$ ./bike-shop.sh
+
+~~~~~ Bike Rental Shop ~~~~~
+
+How may I help you?
+
+1. Rent a bike
+2. Return a bike
+3. Exit
+1
+
+Here are the bikes we have available:
+5) 28" Road Bike
+6) 29" Road Bike
+7) 19" BMX Bike
+8) 20" BMX Bike
+9) 21" BMX Bike
+
+Which one would you like to rent?
+5
+
+What's your phone number?
+555-5555
+
+I have put you down for the 28" Road Bike, Me.
+How may I help you?
+
+1. Rent a bike
+2. Return a bike
+3. Exit
+3
+
+Thank you for stopping in.
+
+codeally@9224d9eeead5:~/project$ 
+	v
+
+
+
+#!/bin/bash
+PSQL="psql -X --username=freecodecamp --dbname=bikes --tuples-only -c"
+
+echo -e "\n~~~~~ Bike Rental Shop ~~~~~\n"
+
+MAIN_MENU()
+{
+  if [[ $1 ]]
+  then
+    echo -e "\n$1"
+  fi
+  
+  echo How may I help you?
+  echo -e "\n1. Rent a bike\n2. Return a bike\n3. Exit"
+  read MAIN_MENU_SELECTION
+  case $MAIN_MENU_SELECTION in 
+    1) RENT_MENU ;;
+    2) RETURN_MENU ;;
+    3) EXIT ;;
+    *) MAIN_MENU "Please enter a valid option." ;;
+  esac
+}
+
+RENT_MENU()
+{
+  #get available bikes
+  AVAILABLE_BIKES=$($PSQL "SELECT bike_id, type, size FROM bikes WHERE available='t' ORDER BY bike_id")
+  #echo "$AVAILABLE_BIKES"
+  #if no bikes available
+  if [[ -z $AVAILABLE_BIKES ]]
+  then
+    #send to main menu
+    MAIN_MENU "Sorry, we don't have any bikes available right now."
+
+    else
+      #display available bikes
+      echo -e "\nHere are the bikes we have available:"
+      echo "$AVAILABLE_BIKES" | while read BIKE_ID BAR TYPE BAR SIZE
+      do
+        echo "$BIKE_ID) $SIZE\" $TYPE Bike"
+      done
+      #ask for bike to rent
+      echo -e "\nWhich one would you like to rent?"
+      read BIKE_ID_TO_RENT
+
+      #if input is not a number
+      if [[ ! $BIKE_ID_TO_RENT =~ ^[0-9]+$ ]]
+      then
+        #send to main menu
+        MAIN_MENU "That is not a valid bike number."
+
+        else
+          #get bike availability
+          BIKE_AVAILABILITY=$($PSQL "SELECT available FROM bikes WHERE bike_id=$BIKE_ID_TO_RENT AND available=true")  #bike_id is to only return the chosen row
+          #echo $BIKE_AVAILABILITY
+          #if not available
+          if [[ -z $BIKE_AVAILABILITY ]]
+          then
+            #send to main menu
+            MAIN_MENU "That bike is not available."
+
+              else
+                #get customer info
+                echo -e "\nWhat's your phone number?"
+                read PHONE_NUMBER
+                CUSTOMER_NAME=$($PSQL "SELECT name FROM customers WHERE phone='$PHONE_NUMBER'")
+                #if customer doesn't exist
+                if [[ -z $CUSTOMER_NAME ]]
+                then
+                  #get new customer name
+                  echo -e "\nWhat's your name?"
+                  read CUSTOMER_NAME
+                  #insert new customer
+                  INSERT_CUSTOMER_RESULT=$($PSQL "INSERT INTO customers(phone, name) VALUES('$PHONE_NUMBER', '$CUSTOMER_NAME')")
+                fi
+
+                #get customer_id
+                CUSTOMER_ID=$($PSQL "SELECT customer_id FROM customers WHERE phone='$PHONE_NUMBER'")
+                #insert bike rental
+                INSERT_RENTAL_RESULT=$($PSQL "INSERT INTO rentals(customer_id, bike_id) VALUES('$CUSTOMER_ID', $BIKE_ID_TO_RENT)")
+                #set bike availability to false
+                SET_TO_FALSE_RESULT=$($PSQL "UPDATE bikes SET available=false WHERE bike_id=$BIKE_ID_TO_RENT")
+                #get bike info
+                BIKE_INFO=$($PSQL "SELECT size, type FROM bikes WHERE bike_id=$BIKE_ID_TO_RENT")
+                BIKE_INFO_FORMATTED=$(echo $BIKE_INFO | sed 's/ |/"/')    #????What does the $ do here???? Since we're saving the result; we need to be able to call the $BIKE_INFO??? {??WHAT ALLOWS IT TO EXECUTE??}
+                #send to main menu
+                MAIN_MENU "I have put you down for the $BIKE_INFO_FORMATTED Bike, $(echo $CUSTOMER_NAME | sed -E 's/^ *| *$//g')."
+          fi
+      fi
+  fi
+  
+
+}
+
+RETURN_MENU()
+{
+  echo Return Menu
+}
+
+EXIT()
+{
+  echo -e "\nThank you for stopping in.\n"
+}
+MAIN_MENU
+	v
+
+
+
+codeally@9224d9eeead5:~/project$ ./bike-shop
+bash: ./bike-shop: No such file or directory
+codeally@9224d9eeead5:~/project$ ./bike-shop.sh
+
+~~~~~ Bike Rental Shop ~~~~~
+
+How may I help you?
+
+1. Rent a bike
+2. Return a bike
+3. Exit
+1
+
+Here are the bikes we have available:
+6) 29" Road Bike
+7) 19" BMX Bike
+8) 20" BMX Bike
+9) 21" BMX Bike
+
+Which one would you like to rent?
+6
+
+What's your phone number?
+000-0000
+
+What's your name?
+Test
+
+I have put you down for the 29" Road Bike, Test.
+How may I help you?
+
+1. Rent a bike
+2. Return a bike
+3. Exit
+3
+
+Thank you for stopping in.
+
+codeally@9224d9eeead5:~/project$ ./bike-shop.sh
+
+~~~~~ Bike Rental Shop ~~~~~
+
+How may I help you?
+
+1. Rent a bike
+2. Return a bike
+3. Exit
+1
+
+Here are the bikes we have available:
+7) 19" BMX Bike
+8) 20" BMX Bike
+9) 21" BMX Bike
+
+Which one would you like to rent?
+7
+
+What's your phone number?
+000-0000
+
+I have put you down for the 19" BMX Bike, Test.
+How may I help you?
+
+1. Rent a bike
+2. Return a bike
+3. Exit
+3
+
+Thank you for stopping in.
+
+codeally@9224d9eeead5:~/project$ 
+	v
+
+
+
+SELECT * FROM bikes ORDER BY bike_id;
+                     
++---------+----------+------+-----------+
+| bike_id |   type   | size | available |
++---------+----------+------+-----------+
+|       1 | Mountain |   27 | f         |
+|       2 | Mountain |   28 | f         |
+|       3 | Mountain |   29 | f         |
+|       4 | Road     |   27 | f         |
+|       5 | Road     |   28 | f         |
+|       6 | Road     |   29 | f         |
+|       7 | BMX      |   19 | f         |
+|       8 | BMX      |   20 | t         |
+|       9 | BMX      |   21 | t         |
++---------+----------+------+-----------+
+(9 rows)
+
+bikes=> SELECT * FROM customers;
+bikes=>                  
++-------------+----------+------+
+| customer_id |  phone   | name |
++-------------+----------+------+
+|           1 | 555-5555 | Me   |
+|           2 | 000-0000 | Test |
++-------------+----------+------+
+(2 rows)
+
+SELECT * FROM rentals;
+bikes=>                                   
++-----------+-------------+---------+-------------+---------------+
+| rental_id | customer_id | bike_id | date_rented | date_returned |
++-----------+-------------+---------+-------------+---------------+
+|         1 |           1 |       1 | 2022-08-09  |               |
+|         2 |           1 |       2 | 2022-08-09  |               |
+|         3 |           1 |       4 | 2022-08-09  |               |
+|         4 |           1 |       3 | 2022-08-09  |               |
+|         5 |           1 |       5 | 2022-08-09  |               |
+|         6 |           2 |       6 | 2022-08-09  |               |
+|         7 |           2 |       7 | 2022-08-09  |               |
++-----------+-------------+---------+-------------+---------------+
+(7 rows)
+	v
+
+
+
+SELECT * FROM bikes LEFT JOIN rentals USING bike_id;
+ERROR:  syntax error at or near "bike_id"
+LINE 1: SELECT * FROM bikes LEFT JOIN rentals USING bike_id;
+                                                    ^
+bikes=> SELECT * FROM bikes LEFT JOIN rentals USING(bike_id);
+                                                 
++---------+----------+------+-----------+-----------+-------------+-------------+---------------+
+| bike_id |   type   | size | available | rental_id | customer_id | date_rented | date_returned |
++---------+----------+------+-----------+-----------+-------------+-------------+---------------+
+|       1 | Mountain |   27 | f         |         1 |           1 | 2022-08-09  |               |
+|       2 | Mountain |   28 | f         |         2 |           1 | 2022-08-09  |               |
+|       4 | Road     |   27 | f         |         3 |           1 | 2022-08-09  |               |
+|       3 | Mountain |   29 | f         |         4 |           1 | 2022-08-09  |               |
+|       5 | Road     |   28 | f         |         5 |           1 | 2022-08-09  |               |
+|       6 | Road     |   29 | f         |         6 |           2 | 2022-08-09  |               |
+|       7 | BMX      |   19 | f         |         7 |           2 | 2022-08-09  |               |
+|       8 | BMX      |   20 | t         |           |             |             |               |
+|       9 | BMX      |   21 | t         |           |             |             |               |
++---------+----------+------+-----------+-----------+-------------+-------------+---------------+
+(9 rows)
+
+bikes=> SELECT * FROM bikes INNER JOIN rentals USING(bike_id);
+                                                 
++---------+----------+------+-----------+-----------+-------------+-------------+---------------+
+| bike_id |   type   | size | available | rental_id | customer_id | date_rented | date_returned |
++---------+----------+------+-----------+-----------+-------------+-------------+---------------+
+|       1 | Mountain |   27 | f         |         1 |           1 | 2022-08-09  |               |
+|       2 | Mountain |   28 | f         |         2 |           1 | 2022-08-09  |               |
+|       4 | Road     |   27 | f         |         3 |           1 | 2022-08-09  |               |
+|       3 | Mountain |   29 | f         |         4 |           1 | 2022-08-09  |               |
+|       5 | Road     |   28 | f         |         5 |           1 | 2022-08-09  |               |
+|       6 | Road     |   29 | f         |         6 |           2 | 2022-08-09  |               |
+|       7 | BMX      |   19 | f         |         7 |           2 | 2022-08-09  |               |
++---------+----------+------+-----------+-----------+-------------+-------------+---------------+
+(7 rows)
+
+bikes=> SELECT * FROM bikes INNER JOIN rentals USING(bike_id) FROM rentals INNER JOIN customers USING(customer_id);
+ERROR:  syntax error at or near "FROM"
+LINE 1: ...CT * FROM bikes INNER JOIN rentals USING(bike_id) FROM renta...
+                                                             ^
+bikes=> SELECT * FROM bikes INNER JOIN rentals USING(bike_id) rentals INNER JOIN customers USING(customer_id);
+ERROR:  syntax error at or near "rentals"
+LINE 1: ...CT * FROM bikes INNER JOIN rentals USING(bike_id) rentals IN...
+                                                             ^
+bikes=> SELECT * FROM bikes INNER JOIN rentals USING(bike_id) INNER JOIN customers USING(customer_id);
+                                                          
++-------------+---------+----------+------+-----------+-----------+-------------+---------------+----------+------+
+| customer_id | bike_id |   type   | size | available | rental_id | date_rented | date_returned |  phone   | name |
++-------------+---------+----------+------+-----------+-----------+-------------+---------------+----------+------+
+|           1 |       1 | Mountain |   27 | f         |         1 | 2022-08-09  |               | 555-5555 | Me   |
+|           1 |       2 | Mountain |   28 | f         |         2 | 2022-08-09  |               | 555-5555 | Me   |
+|           1 |       4 | Road     |   27 | f         |         3 | 2022-08-09  |               | 555-5555 | Me   |
+|           1 |       3 | Mountain |   29 | f         |         4 | 2022-08-09  |               | 555-5555 | Me   |
+|           1 |       5 | Road     |   28 | f         |         5 | 2022-08-09  |               | 555-5555 | Me   |
+|           2 |       6 | Road     |   29 | f         |         6 | 2022-08-09  |               | 000-0000 | Test |
+|           2 |       7 | BMX      |   19 | f         |         7 | 2022-08-09  |               | 000-0000 | Test |
++-------------+---------+----------+------+-----------+-----------+-------------+---------------+----------+------+
+(7 rows)
+
+bikes=> SELECT * FROM bikes INNER JOIN rentals USING(bike_id) INNER JOIN customers USING(customer_id) WHERE phone='555-5555' AND date returned;
+ERROR:  syntax error at or near "returned"
+LINE 1: ...USING(customer_id) WHERE phone='555-5555' AND date returned;
+                                                              ^
+bikes=> SELECT * FROM bikes INNER JOIN rentals USING(bike_id) INNER JOIN customers USING(customer_id) WHERE phone='555-5555' AND date_rreturned;
+ERROR:  column "date_rreturned" does not exist
+LINE 1: ...ers USING(customer_id) WHERE phone='555-5555' AND date_rretu...
+                                                             ^
+HINT:  Perhaps you meant to reference the column "rentals.date_returned".
+bikes=> SELECT * FROM bikes INNER JOIN rentals USING(bike_id) INNER JOIN customers USING(customer_id) WHERE phone='555-5555' AND date_returned;
+ERROR:  argument of AND must be type boolean, not type date
+LINE 1: ...ers USING(customer_id) WHERE phone='555-5555' AND date_retur...
+                                                             ^
+bikes=> SELECT * FROM bikes INNER JOIN rentals USING(bike_id) INNER JOIN customers USING(customer_id) WHERE phone='555-5555' AND date_returned IS NULL;
+                                                          
++-------------+---------+----------+------+-----------+-----------+-------------+---------------+----------+------+
+| customer_id | bike_id |   type   | size | available | rental_id | date_rented | date_returned |  phone   | name |
++-------------+---------+----------+------+-----------+-----------+-------------+---------------+----------+------+
+|           1 |       1 | Mountain |   27 | f         |         1 | 2022-08-09  |               | 555-5555 | Me   |
+|           1 |       2 | Mountain |   28 | f         |         2 | 2022-08-09  |               | 555-5555 | Me   |
+|           1 |       4 | Road     |   27 | f         |         3 | 2022-08-09  |               | 555-5555 | Me   |
+|           1 |       3 | Mountain |   29 | f         |         4 | 2022-08-09  |               | 555-5555 | Me   |
+|           1 |       5 | Road     |   28 | f         |         5 | 2022-08-09  |               | 555-5555 | Me   |
++-------------+---------+----------+------+-----------+-----------+-------------+---------------+----------+------+
+(5 rows)
+
+bikes=> SELECT type, size, name FROM bikes INNER JOIN rentals USING(bike_id) INNER JOIN customers USING(customer_id) WHERE phone='555-5555' AND date_returned IS NULL;
+             
++----------+------+------+
+|   type   | size | name |
++----------+------+------+
+| Mountain |   27 | Me   |
+| Mountain |   28 | Me   |
+| Road     |   27 | Me   |
+| Mountain |   29 | Me   |
+| Road     |   28 | Me   |
++----------+------+------+
+(5 rows)
+
+bikes=> SELECT bike_id, type, size FROM bikes INNER JOIN rentals USING(bike_id) INNER JOIN customers USING(customer_id) WHERE phone='555-5555' AND date_returned IS NULL;
+bikes=>                
++---------+----------+------+
+| bike_id |   type   | size |
++---------+----------+------+
+|       1 | Mountain |   27 |
+|       2 | Mountain |   28 |
+|       4 | Road     |   27 |
+|       3 | Mountain |   29 |
+|       5 | Road     |   28 |
++---------+----------+------+
+(5 rows)
+               bike_id, type, size FROM bikes INNER JOIN rentals USING(bike_id) INNER JOIN customers USING(customer_id) WHERE phone='555-5555' AND date_returned IS NULL;
+bikes=>                
++---------+----------+------+
+| bike_id |   type   | size |
++---------+----------+------+
+|       1 | Mountain |   27 |
+|       2 | Mountain |   28 |
+|       4 | Road     |   27 |
+|       3 | Mountain |   29 |
+|       5 | Road     |   28 |
++---------+----------+------+
+(5 rows)
+
+SELECT bike_id, type, size FROM bikes INNER JOIN rentals USING(bike_id) INNER JOIN customers USING(customer_id) WHERE phone='555-5555' AND date_returned IS NULL ORDER BY bike_id;
+bikes=>                
++---------+----------+------+
+| bike_id |   type   | size |
++---------+----------+------+
+|       1 | Mountain |   27 |
+|       2 | Mountain |   28 |
+|       3 | Mountain |   29 |
+|       4 | Road     |   27 |
+|       5 | Road     |   28 |
++---------+----------+------+
+(5 rows)
+	v
+
+
+
+#!/bin/bash
+PSQL="psql -X --username=freecodecamp --dbname=bikes --tuples-only -c"
+
+echo -e "\n~~~~~ Bike Rental Shop ~~~~~\n"
+
+MAIN_MENU()
+{
+  if [[ $1 ]]
+  then
+    echo -e "\n$1"
+  fi
+  
+  echo How may I help you?
+  echo -e "\n1. Rent a bike\n2. Return a bike\n3. Exit"
+  read MAIN_MENU_SELECTION
+  case $MAIN_MENU_SELECTION in 
+    1) RENT_MENU ;;
+    2) RETURN_MENU ;;
+    3) EXIT ;;
+    *) MAIN_MENU "Please enter a valid option." ;;
+  esac
+}
+
+RENT_MENU()
+{
+  #get available bikes
+  AVAILABLE_BIKES=$($PSQL "SELECT bike_id, type, size FROM bikes WHERE available='t' ORDER BY bike_id")
+  #echo "$AVAILABLE_BIKES"
+  #if no bikes available
+  if [[ -z $AVAILABLE_BIKES ]]
+  then
+    #send to main menu
+    MAIN_MENU "Sorry, we don't have any bikes available right now."
+
+    else
+      #display available bikes
+      echo -e "\nHere are the bikes we have available:"
+      echo "$AVAILABLE_BIKES" | while read BIKE_ID BAR TYPE BAR SIZE
+      do
+        echo "$BIKE_ID) $SIZE\" $TYPE Bike"
+      done
+      #ask for bike to rent
+      echo -e "\nWhich one would you like to rent?"
+      read BIKE_ID_TO_RENT
+
+      #if input is not a number
+      if [[ ! $BIKE_ID_TO_RENT =~ ^[0-9]+$ ]]
+      then
+        #send to main menu
+        MAIN_MENU "That is not a valid bike number."
+
+        else
+          #get bike availability
+          BIKE_AVAILABILITY=$($PSQL "SELECT available FROM bikes WHERE bike_id=$BIKE_ID_TO_RENT AND available=true")  #bike_id is to only return the chosen row
+          #echo $BIKE_AVAILABILITY
+          #if not available
+          if [[ -z $BIKE_AVAILABILITY ]]
+          then
+            #send to main menu
+            MAIN_MENU "That bike is not available."
+
+              else
+                #get customer info
+                echo -e "\nWhat's your phone number?"
+                read PHONE_NUMBER
+                CUSTOMER_NAME=$($PSQL "SELECT name FROM customers WHERE phone='$PHONE_NUMBER'")
+                #if customer doesn't exist
+                if [[ -z $CUSTOMER_NAME ]]
+                then
+                  #get new customer name
+                  echo -e "\nWhat's your name?"
+                  read CUSTOMER_NAME
+                  #insert new customer
+                  INSERT_CUSTOMER_RESULT=$($PSQL "INSERT INTO customers(phone, name) VALUES('$PHONE_NUMBER', '$CUSTOMER_NAME')")
+                fi
+
+                #get customer_id
+                CUSTOMER_ID=$($PSQL "SELECT customer_id FROM customers WHERE phone='$PHONE_NUMBER'")
+                #insert bike rental
+                INSERT_RENTAL_RESULT=$($PSQL "INSERT INTO rentals(customer_id, bike_id) VALUES('$CUSTOMER_ID', $BIKE_ID_TO_RENT)")
+                #set bike availability to false
+                SET_TO_FALSE_RESULT=$($PSQL "UPDATE bikes SET available=false WHERE bike_id=$BIKE_ID_TO_RENT")
+                #get bike info
+                BIKE_INFO=$($PSQL "SELECT size, type FROM bikes WHERE bike_id=$BIKE_ID_TO_RENT")
+                BIKE_INFO_FORMATTED=$(echo $BIKE_INFO | sed 's/ |/"/')    #????What does the $ do here???? Since we're saving the result; we need to be able to call the $BIKE_INFO??? {??WHAT ALLOWS IT TO EXECUTE??}
+                #send to main menu
+                MAIN_MENU "I have put you down for the $BIKE_INFO_FORMATTED Bike, $(echo $CUSTOMER_NAME | sed -E 's/^ *| *$//g')."
+          fi
+      fi
+  fi
+  
+
+}
+
+RETURN_MENU()
+{
+  #get customer info
+  echo -e "\nWhat's your phone number?"
+  read PHONE_NUMBER
+  CUSTOMER_ID=$($PSQL "SELECT customer_id FROM customers WHERE phone='$PHONE_NUMBER'")
+  #if not found
+  if [[ -z $CUSTOMER_ID ]]
+  then
+    #send to main menu
+    MAIN_MENU "I could not find a record for that phone number."
+
+    else
+      #get customer's rentals
+      CUSTOMER_RENTALS=$($PSQL "SELECT bike_id, type, size FROM bikes INNER JOIN rentals USING(bike_id) INNER JOIN customers USING(customer_id) WHERE phone='$PHONE_NUMBER' AND date_returned IS NULL ORDER BY bike_id")
+      echo "$CUSTOMER_RENTALS"
+      #if no rentals
+      #send to main menu
+  fi
+}
+
+EXIT()
+{
+  echo -e "\nThank you for stopping in.\n"
+}
+MAIN_MENU
+	v
+
+
+
+codeally@9224d9eeead5:~/project$ ./bike-shop.sh
+
+~~~~~ Bike Rental Shop ~~~~~
+
+How may I help you?
+
+1. Rent a bike
+2. Return a bike
+3. Exit
+2
+
+What's your phone number?
+123-4567
+
+I could not find a record for that phone number.
+How may I help you?
+
+1. Rent a bike
+2. Return a bike
+3. Exit
+3
+
+Thank you for stopping in.
+
+codeally@9224d9eeead5:~/project$ ./bike-shop.sh
+
+~~~~~ Bike Rental Shop ~~~~~
+
+How may I help you?
+
+1. Rent a bike
+2. Return a bike
+3. Exit
+2
+
+What's your phone number?
+555-5555
+       1 | Mountain |   27
+       2 | Mountain |   28
+       3 | Mountain |   29
+       4 | Road     |   27
+       5 | Road     |   28
+codeally@9224d9eeead5:~/project$ ./bike-shop.sh
+
+~~~~~ Bike Rental Shop ~~~~~
+
+How may I help you?
+
+1. Rent a bike
+2. Return a bike
+3. Exit
+2
+
+What's your phone number?
+555-5555
+
+Here are your rentals:
+       1 | Mountain |   27
+       2 | Mountain |   28
+       3 | Mountain |   29
+       4 | Road     |   27
+       5 | Road     |   28
+codeally@9224d9eeead5:~/project$ ./bike-shop.sh
+
+~~~~~ Bike Rental Shop ~~~~~
+
+How may I help you?
+
+1. Rent a bike
+2. Return a bike
+3. Exit
+2
+
+What's your phone number?
+555-5555
+
+Here are your rentals:
+1) 27" Mountain Bike
+2) 28" Mountain Bike
+3) 29" Mountain Bike
+4) 27" Road Bike
+5) 28" Road Bike
+codeally@9224d9eeead5:~/project$ 
+	v
+
+
+
+#!/bin/bash
+PSQL="psql -X --username=freecodecamp --dbname=bikes --tuples-only -c"
+
+echo -e "\n~~~~~ Bike Rental Shop ~~~~~\n"
+
+MAIN_MENU()
+{
+  if [[ $1 ]]
+  then
+    echo -e "\n$1"
+  fi
+  
+  echo How may I help you?
+  echo -e "\n1. Rent a bike\n2. Return a bike\n3. Exit"
+  read MAIN_MENU_SELECTION
+  case $MAIN_MENU_SELECTION in 
+    1) RENT_MENU ;;
+    2) RETURN_MENU ;;
+    3) EXIT ;;
+    *) MAIN_MENU "Please enter a valid option." ;;
+  esac
+}
+
+RENT_MENU()
+{
+  #get available bikes
+  AVAILABLE_BIKES=$($PSQL "SELECT bike_id, type, size FROM bikes WHERE available='t' ORDER BY bike_id")
+  #echo "$AVAILABLE_BIKES"
+  #if no bikes available
+  if [[ -z $AVAILABLE_BIKES ]]
+  then
+    #send to main menu
+    MAIN_MENU "Sorry, we don't have any bikes available right now."
+
+    else
+      #display available bikes
+      echo -e "\nHere are the bikes we have available:"
+      echo "$AVAILABLE_BIKES" | while read BIKE_ID BAR TYPE BAR SIZE
+      do
+        echo "$BIKE_ID) $SIZE\" $TYPE Bike"
+      done
+      #ask for bike to rent
+      echo -e "\nWhich one would you like to rent?"
+      read BIKE_ID_TO_RENT
+
+      #if input is not a number
+      if [[ ! $BIKE_ID_TO_RENT =~ ^[0-9]+$ ]]
+      then
+        #send to main menu
+        MAIN_MENU "That is not a valid bike number."
+
+        else
+          #get bike availability
+          BIKE_AVAILABILITY=$($PSQL "SELECT available FROM bikes WHERE bike_id=$BIKE_ID_TO_RENT AND available=true")  #bike_id is to only return the chosen row
+          #echo $BIKE_AVAILABILITY
+          #if not available
+          if [[ -z $BIKE_AVAILABILITY ]]
+          then
+            #send to main menu
+            MAIN_MENU "That bike is not available."
+
+              else
+                #get customer info
+                echo -e "\nWhat's your phone number?"
+                read PHONE_NUMBER
+                CUSTOMER_NAME=$($PSQL "SELECT name FROM customers WHERE phone='$PHONE_NUMBER'")
+                #if customer doesn't exist
+                if [[ -z $CUSTOMER_NAME ]]
+                then
+                  #get new customer name
+                  echo -e "\nWhat's your name?"
+                  read CUSTOMER_NAME
+                  #insert new customer
+                  INSERT_CUSTOMER_RESULT=$($PSQL "INSERT INTO customers(phone, name) VALUES('$PHONE_NUMBER', '$CUSTOMER_NAME')")
+                fi
+
+                #get customer_id
+                CUSTOMER_ID=$($PSQL "SELECT customer_id FROM customers WHERE phone='$PHONE_NUMBER'")
+                #insert bike rental
+                INSERT_RENTAL_RESULT=$($PSQL "INSERT INTO rentals(customer_id, bike_id) VALUES('$CUSTOMER_ID', $BIKE_ID_TO_RENT)")
+                #set bike availability to false
+                SET_TO_FALSE_RESULT=$($PSQL "UPDATE bikes SET available=false WHERE bike_id=$BIKE_ID_TO_RENT")
+                #get bike info
+                BIKE_INFO=$($PSQL "SELECT size, type FROM bikes WHERE bike_id=$BIKE_ID_TO_RENT")
+                BIKE_INFO_FORMATTED=$(echo $BIKE_INFO | sed 's/ |/"/')    #????What does the $ do here???? Since we're saving the result; we need to be able to call the $BIKE_INFO??? {??WHAT ALLOWS IT TO EXECUTE??}
+                #send to main menu
+                MAIN_MENU "I have put you down for the $BIKE_INFO_FORMATTED Bike, $(echo $CUSTOMER_NAME | sed -E 's/^ *| *$//g')."
+          fi
+      fi
+  fi
+  
+
+}
+
+RETURN_MENU()
+{
+  #get customer info
+  echo -e "\nWhat's your phone number?"
+  read PHONE_NUMBER
+  CUSTOMER_ID=$($PSQL "SELECT customer_id FROM customers WHERE phone='$PHONE_NUMBER'")
+  #if not found
+  if [[ -z $CUSTOMER_ID ]]
+  then
+    #send to main menu
+    MAIN_MENU "I could not find a record for that phone number."
+
+    else
+      #get customer's rentals
+      CUSTOMER_RENTALS=$($PSQL "SELECT bike_id, type, size FROM bikes INNER JOIN rentals USING(bike_id) INNER JOIN customers USING(customer_id) WHERE phone='$PHONE_NUMBER' AND date_returned IS NULL ORDER BY bike_id")
+      #echo "$CUSTOMER_RENTALS"
+      #if no rentals
+      if [[ -z $CUSTOMER_RENTALS ]]
+      then
+        #send to main menu
+        MAIN_MENU "You do not have any bikes rented."
+
+        else
+          #display rented bikes
+          echo -e "\nHere are your rentals:"
+          echo "$CUSTOMER_RENTALS" | while read BIKE_ID BAR TYPE BAR SIZE
+          do
+            #???Why no \n again???
+            echo "$BIKE_ID) $SIZE\" $TYPE Bike"
+          done
+          #ask for bike to return
+          echo -e "\nWhich one would you like to return?"
+          read BIKE_ID_TO_RETURN
+          #if not a number
+          if [[ ! $BIKE_ID_TO_RETURN =~ ^[0-9]+$ ]]   #??What does =~ mean????
+          then
+            #send to main menu
+            MAIN_MENU "That is not a valid bike number."
+
+            else
+              #check if input is rented
+              
+              #if input not rented
+
+              #send to main menu
+
+          fi
+      fi
+  fi
+}
+
+EXIT()
+{
+  echo -e "\nThank you for stopping in.\n"
+}
+MAIN_MENU
+	v
+
+
+
+postgres=> \c bikes
+You are now connected to database "bikes" as user "freecodecamp".
+bikes=> SELECT * FROM rentals INNER JOIN customers USING(customer_id);
+bikes=>                                            
++-------------+-----------+---------+-------------+---------------+----------+------+
+| customer_id | rental_id | bike_id | date_rented | date_returned |  phone   | name |
++-------------+-----------+---------+-------------+---------------+----------+------+
+|           1 |         1 |       1 | 2021-05-25  |               | 555-5555 | Me   |
+|           1 |         2 |       2 | 2021-05-25  |               | 555-5555 | Me   |
+|           1 |         3 |       3 | 2021-05-27  |               | 555-5555 | Me   |
+|           1 |         4 |       4 | 2021-05-27  |               | 555-5555 | Me   |
+|           1 |         5 |       5 | 2021-05-27  |               | 555-5555 | Me   |
+|           2 |         6 |       6 | 2021-05-27  |               | 000-0000 | Test |
+|           2 |         7 |       7 | 2021-05-27  |               | 000-0000 | Test |
++-------------+-----------+---------+-------------+---------------+----------+------+
+(7 rows)
+
+SELECT * FROM rentals INNER JOIN customers USING(customer_id) WHERE phone='555-5555' AND bike_id='1' AND date_returned IS NULL;
+                                           
++-------------+-----------+---------+-------------+---------------+----------+------+
+| customer_id | rental_id | bike_id | date_rented | date_returned |  phone   | name |
++-------------+-----------+---------+-------------+---------------+----------+------+
+|           1 |         1 |       1 | 2021-05-25  |               | 555-5555 | Me   |
++-------------+-----------+---------+-------------+---------------+----------+------+
+(1 row)
+
+bikes=> SELECT bike_id FROM rentals INNER JOIN customers USING(customer_id) WHERE phone='555-5555' AND bike_id='1' AND date_returned IS NULL;
+      
++---------+
+| bike_id |
++---------+
+|       1 |
++---------+
+(1 row)
+
+bikes=> bikes=> SELECT rental_id FROM rentals INNER JOIN customers USING(customer_id) WHERE phone='555-5555' AND bike_id='1' AND date_returned IS NULL;
+bikes=>        
++-----------+
+| rental_id |
++-----------+
+|         1 |
++-----------+
+(1 row)
+	v
+
+
+
+#!/bin/bash
+
+PSQL="psql -X --username=freecodecamp --dbname=bikes --tuples-only -c"
+
+echo -e "\n~~~~~ Bike Rental Shop ~~~~~\n"
+
+MAIN_MENU() {
+  if [[ $1 ]]
+  then
+    echo -e "\n$1"
+  fi
+
+  echo "How may I help you?" 
+  echo -e "\n1. Rent a bike\n2. Return a bike\n3. Exit"
+  read MAIN_MENU_SELECTION
+
+  case $MAIN_MENU_SELECTION in
+    1) RENT_MENU ;;
+    2) RETURN_MENU ;;
+    3) EXIT ;;
+    *) MAIN_MENU "Please enter a valid option." ;;
+  esac
+}
+
+RENT_MENU() {
+  # get available bikes
+  AVAILABLE_BIKES=$($PSQL "SELECT bike_id, type, size FROM bikes WHERE available = true ORDER BY bike_id")
+
+  # if no bikes available
+  if [[ -z $AVAILABLE_BIKES ]]
+  then
+    # send to main menu
+    MAIN_MENU "Sorry, we don't have any bikes available right now."
+  else
+    # display available bikes
+    echo -e "\nHere are the bikes we have available:"
+    echo "$AVAILABLE_BIKES" | while read BIKE_ID BAR TYPE BAR SIZE
+    do
+      echo "$BIKE_ID) $SIZE\" $TYPE Bike"
+    done
+
+    # ask for bike to rent
+    echo -e "\nWhich one would you like to rent?"
+    read BIKE_ID_TO_RENT
+
+    # if input is not a number
+    if [[ ! $BIKE_ID_TO_RENT =~ ^[0-9]+$ ]]
+    then
+      # send to main menu
+      MAIN_MENU "That is not a valid bike number."
+    else
+      # get bike availability
+      BIKE_AVAILABILITY=$($PSQL "SELECT available FROM bikes WHERE bike_id = $BIKE_ID_TO_RENT AND available = true")
+
+      # if not available
+      if [[ -z $BIKE_AVAILABILITY ]]
+      then
+        # send to main menu
+        MAIN_MENU "That bike is not available."
+      else
+        # get customer info
+        echo -e "\nWhat's your phone number?"
+        read PHONE_NUMBER
+
+        CUSTOMER_NAME=$($PSQL "SELECT name FROM customers WHERE phone = '$PHONE_NUMBER'")
+
+        # if customer doesn't exist
+        if [[ -z $CUSTOMER_NAME ]]
+        then
+          # get new customer name
+          echo -e "\nWhat's your name?"
+          read CUSTOMER_NAME
+
+          # insert new customer
+          INSERT_CUSTOMER_RESULT=$($PSQL "INSERT INTO customers(name, phone) VALUES('$CUSTOMER_NAME', '$PHONE_NUMBER')") 
+        fi
+
+        # get customer_id
+        CUSTOMER_ID=$($PSQL "SELECT customer_id FROM customers WHERE phone='$PHONE_NUMBER'")
+
+        # insert bike rental
+        INSERT_RENTAL_RESULT=$($PSQL "INSERT INTO rentals(customer_id, bike_id) VALUES($CUSTOMER_ID, $BIKE_ID_TO_RENT)")
+
+        # set bike availability to false
+        SET_TO_FALSE_RESULT=$($PSQL "UPDATE bikes SET available = false WHERE bike_id = $BIKE_ID_TO_RENT")
+
+        # get bike info
+        BIKE_INFO=$($PSQL "SELECT size, type FROM bikes WHERE bike_id = $BIKE_ID_TO_RENT")
+        BIKE_INFO_FORMATTED=$(echo $BIKE_INFO | sed 's/ |/"/')
+        
+        # send to main menu
+        MAIN_MENU "I have put you down for the $BIKE_INFO_FORMATTED Bike, $(echo $CUSTOMER_NAME | sed -r 's/^ *| *$//g')."
+      fi
+    fi
+  fi
+}
+
+RETURN_MENU() {
+  # get customer info
+  echo -e "\nWhat's your phone number?"
+  read PHONE_NUMBER
+
+  CUSTOMER_ID=$($PSQL "SELECT customer_id FROM customers WHERE phone = '$PHONE_NUMBER'")
+
+  # if not found
+  if [[ -z $CUSTOMER_ID  ]]
+  then
+    # send to main menu
+    MAIN_MENU "I could not find a record for that phone number."
+  else
+    # get customer's rentals
+    CUSTOMER_RENTALS=$($PSQL "SELECT bike_id, type, size FROM bikes INNER JOIN rentals USING(bike_id) INNER JOIN customers USING(customer_id) WHERE phone = '$PHONE_NUMBER' AND date_returned IS NULL ORDER BY bike_id")
+
+    # if no rentals
+    if [[ -z $CUSTOMER_RENTALS  ]]
+    then
+      # send to main menu
+      MAIN_MENU "You do not have any bikes rented."
+    else
+      # display rented bikes
+      echo -e "\nHere are your rentals:"
+      echo "$CUSTOMER_RENTALS" | while read BIKE_ID BAR TYPE BAR SIZE
+      do
+        echo "$BIKE_ID) $SIZE\" $TYPE Bike"
+      done
+
+      # ask for bike to return
+      echo -e "\nWhich one would you like to return?"
+      read BIKE_ID_TO_RETURN
+
+      # if not a number
+      if [[ ! $BIKE_ID_TO_RETURN =~ ^[0-9]+$ ]]
+      then
+        # send to main menu
+        MAIN_MENU "That is not a valid bike number."
+      else
+        # check if input is rented
+        RENTAL_ID=$($PSQL "SELECT rental_id FROM rentals INNER JOIN customers USING(customer_id) WHERE phone='$PHONE_NUMBER' AND bike_id='$BIKE_ID_TO_RETURN' AND date_returned IS NULL")
+        # if input not rented
+        if [[ -z $RENTAL_ID ]]
+        then
+          #send to main menu
+          MAIN_MENU "You do not have that bike rented."
+
+          else
+            echo Rental ID $RENTAL_ID found
+        fi
+      fi
+    fi
+  fi
+}
+
+EXIT() {
+  echo -e "\nThank you for stopping in.\n"
+}
+
+MAIN_MENU
+	v
+
+
+
+codeally@35fe73de7f94:~/project$ ./bike-shop.sh
+
+~~~~~ Bike Rental Shop ~~~~~
+
+How may I help you?
+
+1. Rent a bike
+2. Return a bike
+3. Exit
+2
+
+What's your phone number?
+555-5555
+
+Here are your rentals:
+1) 27" Mountain Bike
+2) 28" Mountain Bike
+3) 29" Mountain Bike
+4) 27" Road Bike
+5) 28" Road Bike
+
+Which one would you like to return?
+7
+
+You do not have that bike rented.
+How may I help you?
+
+1. Rent a bike
+2. Return a bike
+3. Exit
+2
+
+What's your phone number?
+555-5555
+
+Here are your rentals:
+1) 27" Mountain Bike
+2) 28" Mountain Bike
+3) 29" Mountain Bike
+4) 27" Road Bike
+5) 28" Road Bike
+
+Which one would you like to return?
+3
+Rental ID 3 found
+codeally@35fe73de7f94:~/project$ ./bike-shop.sh
+
+~~~~~ Bike Rental Shop ~~~~~
+
+How may I help you?
+
+1. Rent a bike
+2. Return a bike
+3. Exit
+2
+
+What's your phone number?
+555-5555
+
+Here are your rentals:
+1) 27" Mountain Bike
+2) 28" Mountain Bike
+3) 29" Mountain Bike
+4) 27" Road Bike
+5) 28" Road Bike
+
+Which one would you like to return?
+3
+
+Thank you for returning your bike.
+How may I help you?
+
+1. Rent a bike
+2. Return a bike
+3. Exit
+3
+
+Thank you for stopping in.
+
+codeally@35fe73de7f94:~/project$ 
+	v
+
+
+
+#!/bin/bash
+
+PSQL="psql -X --username=freecodecamp --dbname=bikes --tuples-only -c"
+
+echo -e "\n~~~~~ Bike Rental Shop ~~~~~\n"
+
+MAIN_MENU() {
+  if [[ $1 ]]
+  then
+    echo -e "\n$1"
+  fi
+
+  echo "How may I help you?" 
+  echo -e "\n1. Rent a bike\n2. Return a bike\n3. Exit"
+  read MAIN_MENU_SELECTION
+
+  case $MAIN_MENU_SELECTION in
+    1) RENT_MENU ;;
+    2) RETURN_MENU ;;
+    3) EXIT ;;
+    *) MAIN_MENU "Please enter a valid option." ;;
+  esac
+}
+
+RENT_MENU() {
+  # get available bikes
+  AVAILABLE_BIKES=$($PSQL "SELECT bike_id, type, size FROM bikes WHERE available = true ORDER BY bike_id")
+
+  # if no bikes available
+  if [[ -z $AVAILABLE_BIKES ]]
+  then
+    # send to main menu
+    MAIN_MENU "Sorry, we don't have any bikes available right now."
+  else
+    # display available bikes
+    echo -e "\nHere are the bikes we have available:"
+    echo "$AVAILABLE_BIKES" | while read BIKE_ID BAR TYPE BAR SIZE
+    do
+      echo "$BIKE_ID) $SIZE\" $TYPE Bike"
+    done
+
+    # ask for bike to rent
+    echo -e "\nWhich one would you like to rent?"
+    read BIKE_ID_TO_RENT
+
+    # if input is not a number
+    if [[ ! $BIKE_ID_TO_RENT =~ ^[0-9]+$ ]]
+    then
+      # send to main menu
+      MAIN_MENU "That is not a valid bike number."
+    else
+      # get bike availability
+      BIKE_AVAILABILITY=$($PSQL "SELECT available FROM bikes WHERE bike_id = $BIKE_ID_TO_RENT AND available = true")
+
+      # if not available
+      if [[ -z $BIKE_AVAILABILITY ]]
+      then
+        # send to main menu
+        MAIN_MENU "That bike is not available."
+      else
+        # get customer info
+        echo -e "\nWhat's your phone number?"
+        read PHONE_NUMBER
+
+        CUSTOMER_NAME=$($PSQL "SELECT name FROM customers WHERE phone = '$PHONE_NUMBER'")
+
+        # if customer doesn't exist
+        if [[ -z $CUSTOMER_NAME ]]
+        then
+          # get new customer name
+          echo -e "\nWhat's your name?"
+          read CUSTOMER_NAME
+
+          # insert new customer
+          INSERT_CUSTOMER_RESULT=$($PSQL "INSERT INTO customers(name, phone) VALUES('$CUSTOMER_NAME', '$PHONE_NUMBER')") 
+        fi
+
+        # get customer_id
+        CUSTOMER_ID=$($PSQL "SELECT customer_id FROM customers WHERE phone='$PHONE_NUMBER'")
+
+        # insert bike rental
+        INSERT_RENTAL_RESULT=$($PSQL "INSERT INTO rentals(customer_id, bike_id) VALUES($CUSTOMER_ID, $BIKE_ID_TO_RENT)")
+
+        # set bike availability to false
+        SET_TO_FALSE_RESULT=$($PSQL "UPDATE bikes SET available = false WHERE bike_id = $BIKE_ID_TO_RENT")
+
+        # get bike info
+        BIKE_INFO=$($PSQL "SELECT size, type FROM bikes WHERE bike_id = $BIKE_ID_TO_RENT")
+        BIKE_INFO_FORMATTED=$(echo $BIKE_INFO | sed 's/ |/"/')
+        
+        # send to main menu
+        MAIN_MENU "I have put you down for the $BIKE_INFO_FORMATTED Bike, $(echo $CUSTOMER_NAME | sed -r 's/^ *| *$//g')."
+      fi
+    fi
+  fi
+}
+
+RETURN_MENU() {
+  # get customer info
+  echo -e "\nWhat's your phone number?"
+  read PHONE_NUMBER
+
+  CUSTOMER_ID=$($PSQL "SELECT customer_id FROM customers WHERE phone = '$PHONE_NUMBER'")
+
+  # if not found
+  if [[ -z $CUSTOMER_ID  ]]
+  then
+    # send to main menu
+    MAIN_MENU "I could not find a record for that phone number."
+  else
+    # get customer's rentals
+    CUSTOMER_RENTALS=$($PSQL "SELECT bike_id, type, size FROM bikes INNER JOIN rentals USING(bike_id) INNER JOIN customers USING(customer_id) WHERE phone = '$PHONE_NUMBER' AND date_returned IS NULL ORDER BY bike_id")
+
+    # if no rentals
+    if [[ -z $CUSTOMER_RENTALS  ]]
+    then
+      # send to main menu
+      MAIN_MENU "You do not have any bikes rented."
+    else
+      # display rented bikes
+      echo -e "\nHere are your rentals:"
+      echo "$CUSTOMER_RENTALS" | while read BIKE_ID BAR TYPE BAR SIZE
+      do
+        echo "$BIKE_ID) $SIZE\" $TYPE Bike"
+      done
+
+      # ask for bike to return
+      echo -e "\nWhich one would you like to return?"
+      read BIKE_ID_TO_RETURN
+
+      # if not a number
+      if [[ ! $BIKE_ID_TO_RETURN =~ ^[0-9]+$ ]]
+      then
+        # send to main menu
+        MAIN_MENU "That is not a valid bike number."
+      else
+        # check if input is rented
+        RENTAL_ID=$($PSQL "SELECT rental_id FROM rentals INNER JOIN customers USING(customer_id) WHERE phone='$PHONE_NUMBER' AND bike_id='$BIKE_ID_TO_RETURN' AND date_returned IS NULL")
+        # if input not rented
+        if [[ -z $RENTAL_ID ]]
+        then
+          #send to main menu
+          MAIN_MENU "You do not have that bike rented."
+
+          else
+            # update date_returned
+            RETURN_BIKE_RESULT=$($PSQL "UPDATE rentals SET date_returned=NOW() WHERE rental_id='$RENTAL_ID'")
+            # set bike availability to true
+            SET_TO_TRUE_RESULT=$($PSQL "UPDATE bikes SET available=true WHERE bike_id='$BIKE_ID_TO_RETURN'")
+            # send to main menu
+            MAIN_MENU "Thank you for returning your bike."
+        fi
+      fi
+    fi
+  fi
+}
+
+EXIT() {
+  echo -e "\nThank you for stopping in.\n"
+}
+
+MAIN_MENU
+	v
+
+
+
+SELECT * FROM rentals INNER JOIN customers USING(customer_id) WHERE phone='555-5555' AND bike_id='1' AND date_returned IS NULL;
+                                           
++-------------+-----------+---------+-------------+---------------+----------+------+
+| customer_id | rental_id | bike_id | date_rented | date_returned |  phone   | name |
++-------------+-----------+---------+-------------+---------------+----------+------+
+|           1 |         1 |       1 | 2021-05-25  |               | 555-5555 | Me   |
++-------------+-----------+---------+-------------+---------------+----------+------+
+(1 row)
+
+bikes=> SELECT bike_id FROM rentals INNER JOIN customers USING(customer_id) WHERE phone='555-5555' AND bike_id='1' AND date_returned IS NULL;
+      
++---------+
+| bike_id |
++---------+
+|       1 |
++---------+
+(1 row)
+
+bikes=> bikes=> SELECT rental_id FROM rentals INNER JOIN customers USING(customer_id) WHERE phone='555-5555' AND bike_id='1' AND date_returned IS NULL;
+bikes=>        
++-----------+
+| rental_id |
++-----------+
+|         1 |
++-----------+
+(1 row)
+
+SELECT * FROM bikes;
+bikes=>                      
++---------+----------+------+-----------+
+| bike_id |   type   | size | available |
++---------+----------+------+-----------+
+|       8 | BMX      |   20 | t         |
+|       9 | BMX      |   21 | t         |
+|       1 | Mountain |   27 | f         |
+|       2 | Mountain |   28 | f         |
+|       3 | Mountain |   29 | f         |
+|       4 | Road     |   27 | f         |
+|       5 | Road     |   28 | f         |
+|       6 | Road     |   29 | f         |
+|       7 | BMX      |   19 | f         |
++---------+----------+------+-----------+
+(9 rows)
+
+SELECT * FROM rentals;
+bikes=>                                   
++-----------+-------------+---------+-------------+---------------+
+| rental_id | customer_id | bike_id | date_rented | date_returned |
++-----------+-------------+---------+-------------+---------------+
+|         1 |           1 |       1 | 2021-05-25  |               |
+|         2 |           1 |       2 | 2021-05-25  |               |
+|         4 |           1 |       4 | 2021-05-27  |               |
+|         5 |           1 |       5 | 2021-05-27  |               |
+|         6 |           2 |       6 | 2021-05-27  |               |
+|         7 |           2 |       7 | 2021-05-27  |               |
+|         3 |           1 |       3 | 2021-05-27  | 2022-08-10    |
++-----------+-------------+---------+-------------+---------------+
+(7 rows)
+
+SELECT * FROM bikes ORDER BY bike_id;
+bikes=>                      
++---------+----------+------+-----------+
+| bike_id |   type   | size | available |
++---------+----------+------+-----------+
+|       1 | Mountain |   27 | f         |
+|       2 | Mountain |   28 | f         |
+|       3 | Mountain |   29 | t         |
+|       4 | Road     |   27 | f         |
+|       5 | Road     |   28 | f         |
+|       6 | Road     |   29 | f         |
+|       7 | BMX      |   19 | f         |
+|       8 | BMX      |   20 | t         |
+|       9 | BMX      |   21 | t         |
++---------+----------+------+-----------+
+(9 rows)
